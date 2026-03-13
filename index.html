@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的伊甸园</title>
+<style>
+.screen-wipe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #111;
+    z-index: 9999;
+    animation: swipeRight 0.7s cubic-bezier(0.77, 0, 0.175, 1) 0.3s forwards;
+}
+
+@keyframes swipeRight {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes pixivSlideUp {
+    0% { opacity: 0; transform: translateY(120px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f7f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    cursor: default;
+}
+
+.hero {
+    position: relative;
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+}
+
+.floating-bg { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; }
+.float-item {
+    position: absolute; border-radius: 16px; opacity: 0;
+    animation: pixivSlideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+}
+
+.item1 { width: 220px; height: 320px; left: 8%; top: 15%; animation-delay: 0.1s; background-color: #ffd6a5; }
+.item2 { width: 280px; height: 180px; right: 10%; top: 20%; animation-delay: 0.25s; background-color: #ffadad; }
+.item3 { width: 200px; height: 260px; left: 18%; bottom: 10%; animation-delay: 0.4s; background-color: #caffbf; }
+.item4 { width: 300px; height: 220px; right: 15%; bottom: 15%; animation-delay: 0.55s; background-color: #9bf6ff; }
+
+.hero-content {
+    position: relative; z-index: 10; text-align: center;
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
+    padding: 50px 80px; border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+    opacity: 0; animation: pixivSlideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
+}
+
+.hero-subtitle { color: #888; font-size: 1.2rem; margin-bottom: 10px; font-weight: 500; }
+.hero-title { margin: 0; font-size: 3.5rem; font-weight: 800; color: #1a1a1a; letter-spacing: -1px; }
+.hero-title span { color: #ff9800; }
+
+.container { max-width: 1100px; margin: 4rem auto; padding: 0 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+
+.card-wrapper {
+    opacity: 0; transform: translateY(80px);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-wrapper.visible { opacity: 1; transform: translateY(0); }
+
+.info-card {
+    background: #fff; padding: 40px; border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: all 0.5s ease;
+    height: 100%; box-sizing: border-box;
+}
+.info-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+.info-card h2 { color: #1a1a1a; margin-top: 0; font-size: 1.5rem; }
+.info-card p { color: #666; font-size: 1rem; line-height: 1.8; }
+
+.dlc-section { margin-bottom: 60px; display: flex; flex-direction: column; align-items: center; }
+.dlc-title { color: #888; font-size: 1.1rem; margin-bottom: 20px; letter-spacing: 1px; }
+.card-scene { width: 320px; height: 200px; perspective: 1000px; cursor: pointer; }
+.gacha-card {
+    width: 100%; height: 100%; position: relative;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+}
+.gacha-card.is-flipped { transform: rotateY(180deg); }
+.card-face {
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    border-radius: 20px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px;
+    box-sizing: border-box; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+.card-front { background: linear-gradient(135deg, #fffaf0 0%, #fff 100%); border: 4px solid #f8ecec; }
+.card-front h3 { margin: 0; color: #ffb7b2; font-size: 1.8rem; }
+.card-front p { color: #a0a0a0; font-size: 0.9rem; margin-top: 10px; }
+.card-back { background-color: #fff; transform: rotateY(180deg); border: 2px dashed #ffb7b2; }
+.fortune-level { font-size: 1.8rem; font-weight: bold; color: #e57373; margin-bottom: 10px; }
+.fortune-text { font-size: 1rem; line-height: 1.6; color: #666; }
+
+footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
+
+.pixel-cat {
+    position: fixed;
+    top: -50px;
+    left: -50px;
+    width: 48px;
+    height: 48px;
+    pointer-events: none;
+    z-index: 9998;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pixel-cat img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* ================= 核心修改：GIF 镜像翻转 ================= */
+    transform: scaleX(-1);
+}
+</style>
+</head>
+<body>
+
+<div class="screen-wipe"></div>
+
+<div class="pixel-cat" id="pixelCat">
+    <img src="cat.gif" alt="">
+</div>
+
+<div class="hero">
+    <div class="floating-bg">
+        <div class="float-item item1"></div>
+        <div class="float-item item2"></div>
+        <div class="float-item item3"></div>
+        <div class="float-item item4"></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-subtitle">欢迎来到我的赛博秘密基地</div>
+        <h1 class="hero-title">日常碎碎念，<span>魅力无穷</span></h1>
+    </div>
+</div>
+
+<div class="container" id="content">
+    
+    <div class="card-wrapper scroll-anim dlc-section">
+        <div class="dlc-title">— 今日运势 DLC 模块 —</div>
+        <div class="card-scene" onclick="flipCard()">
+            <div class="gacha-card" id="myCard">
+                <div class="card-face card-front">
+                    <h3>⛩️ 每日祈愿</h3>
+                    <p>点击翻开今天的专属动漫台词</p>
+                </div>
+                <div class="card-face card-back">
+                    <div class="fortune-level" id="fortuneLevel">大吉</div>
+                    <div class="fortune-text" id="fortuneText">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card-wrapper scroll-anim" style="transition-delay: 0.1s;">
+            <div class="info-card">
+                <h2>📷 镜头与光影</h2>
+                <p>带着 Canon R50 穿梭在漫展与日常中。喜欢用镜头捕捉喜欢的 Cosplay，也尝试用 AI 工具为照片加入不一样的色彩与光影。</p>
+            </div>
+        </div>
+        <div class="card-wrapper scroll-anim" style="transition-delay: 0.2s;">
+            <div class="info-card">
+                <h2>🎨 纸片人与色彩</h2>
+                <p>喜欢 Momoko、甘城猫猫等画师的细腻笔触，热衷于《咒术回战》《魔女之旅》等番剧。色彩和画集是生活中不可或缺的调剂品。</p>
+            </div>
+        </div>
+        <div class="card-wrapper scroll-anim" style="transition-delay: 0.3s;">
+            <div class="info-card">
+                <h2>📚 书房一角</h2>
+                <p>坚定的实体书收集控。经常沉浸在阿加莎的悬疑推理迷局中，或是翻开《三体》《球状闪电》，感受硬核科幻的浪漫。</p>
+            </div>
+        </div>
+        <div class="card-wrapper scroll-anim" style="transition-delay: 0.1s;">
+            <div class="info-card">
+                <h2>🎮 游戏与虚拟空间</h2>
+                <p>不仅喜欢拉着朋友在《饥荒》和《幻兽帕鲁》里开荒建服，偶尔也会戴上 Pico 4 Ultra，在 VR 的世界里探索新奇的视觉体验。</p>
+            </div>
+        </div>
+        <div class="card-wrapper scroll-anim" style="transition-delay: 0.2s;">
+            <div class="info-card">
+                <h2>🎵 尤克里里练习中</h2>
+                <p>最近开始尝试拨弄尤克里里的琴弦，还在慢慢摸索阶段，希望能给平淡的日常加上一点轻松的 BGM。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © 2026 我的伊甸园
+</footer>
+
+<script>
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.scroll-anim').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+
+    const fortunes = [
+        { level: "大吉", text: "今日宜重温《魔女之旅》，享受一段没有终点的旅程。" },
+        { level: "中吉", text: "泡一杯热茶，翻开那本吃灰的阿加莎小说吧，迷局在等你。" },
+        { level: "大吉", text: "适合在《幻兽帕鲁》里摸鱼，或者盖一座舒适的木屋。" },
+        { level: "超吉", text: "《咒术回战》里的烦恼就留在动漫里，今天你在现实中是无敌的！" }
+    ];
+
+    let isFlipped = false;
+    function flipCard() {
+        const card = document.getElementById('myCard');
+        if (!isFlipped) {
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            document.getElementById('fortuneLevel').innerText = fortunes[randomIndex].level;
+            document.getElementById('fortuneText').innerText = fortunes[randomIndex].text;
+            
+            if(fortunes[randomIndex].level === "末吉") {
+                document.getElementById('fortuneLevel').style.color = "#90a4ae";
+            } else {
+                document.getElementById('fortuneLevel').style.color = "#e57373";
+            }
+            card.classList.add('is-flipped');
+            isFlipped = true;
+        } else {
+            card.classList.remove('is-flipped');
+            isFlipped = false;
+        }
+    }
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let catX = mouseX;
+    let catY = mouseY;
+    const cat = document.getElementById('pixelCat');
+    let isFacingRight = true;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function animateCat() {
+        let distX = mouseX - catX;
+        let distY = mouseY - catY;
+        
+        catX += distX * 0.015;
+        catY += distY * 0.015;
+
+        if (distX > 2) isFacingRight = true;
+        if (distX < -2) isFacingRight = false;
+
+        let scaleX = isFacingRight ? 1 : -1;
+        
+        cat.style.left = catX + 'px';
+        cat.style.top = catY + 'px';
+        cat.style.transform = `scaleX(${scaleX})`;
+
+        requestAnimationFrame(animateCat);
+    }
+    animateCat();
+</script>
+</body>
+</html>
