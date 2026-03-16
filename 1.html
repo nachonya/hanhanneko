@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乾坤速断 </title>
+    <!-- 引入 Tailwind CSS 进行样式布局 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+        body { font-family: 'Noto Serif SC', serif; }
+        .trigram-line { height: 8px; margin-bottom: 4px; }
+        .yang { background-color: #d97706; width: 100%; }
+        .yin { display: flex; justify-content: space-between; width: 100%; }
+        .yin span { background-color: #d97706; width: 45%; height: 100%; }
+        
+        /* 动画效果 */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-stone-900 text-stone-200 min-h-screen flex justify-center items-start p-4">
+
+    <div class="max-w-md w-full bg-stone-800 rounded-xl shadow-2xl border border-stone-700 overflow-hidden mt-8">
+        
+        <!-- 头部 -->
+        <div class="bg-stone-950 p-6 text-center border-b border-stone-700 relative">
+            <div class="absolute top-4 left-4 text-stone-600 border-2 border-stone-600 rounded-full w-8 h-8 flex items-center justify-center text-xs">道</div>
+            <h1 class="text-2xl font-bold text-amber-500 tracking-widest">乾坤速断</h1>
+            <p class="text-xs text-stone-500 mt-2">HTML天机便携版</p>
+        </div>
+
+        <!-- 选项卡 -->
+        <div class="flex border-b border-stone-700">
+            <button onclick="switchTab('meihua')" id="tab-meihua" class="flex-1 p-3 text-sm flex items-center justify-center gap-2 bg-stone-800 text-amber-500 border-b-2 border-amber-500 transition-colors">
+                <i class="fa-solid fa-clock"></i> 梅花
+            </button>
+            <button onclick="switchTab('coin')" id="tab-coin" class="flex-1 p-3 text-sm flex items-center justify-center gap-2 bg-stone-900 text-stone-500 border-b-2 border-transparent transition-colors">
+                <i class="fa-solid fa-coins"></i> 六爻
+            </button>
+            <button onclick="switchTab('bazi')" id="tab-bazi" class="flex-1 p-3 text-sm flex items-center justify-center gap-2 bg-stone-900 text-stone-500 border-b-2 border-transparent transition-colors">
+                <i class="fa-solid fa-calendar-days"></i> 八字
+            </button>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="p-6 space-y-4">
+            
+            <!-- 输入项 -->
+            <div>
+                <label class="block text-xs text-stone-400 mb-1">缘主姓名</label>
+                <input type="text" id="username" placeholder="不填则默认为有缘人" class="w-full bg-stone-900 border border-stone-700 rounded p-2 text-sm focus:border-amber-500 outline-none text-stone-200">
+            </div>
+            <div>
+                <label class="block text-xs text-stone-400 mb-1">所问何事</label>
+                <input type="text" id="query" placeholder="如：今日财运、失物寻找..." class="w-full bg-stone-900 border border-stone-700 rounded p-2 text-sm focus:border-amber-500 outline-none text-stone-200">
+            </div>
+
+            <!-- 梅花面板 -->
+            <div id="panel-meihua" class="text-center py-4">
+                <p class="text-xs text-stone-500 mb-4">“万物皆有数，触机即神机”<br>点击下方按钮，以此刻时空起卦。</p>
+                <button onclick="calculateMeihua()" class="w-full bg-amber-700 hover:bg-amber-600 text-white font-bold py-3 rounded shadow-lg transition-all">
+                    当前时间起卦
+                </button>
+            </div>
+
+            <!-- 六爻面板 -->
+            <div id="panel-coin" class="hidden text-center py-2">
+                <p class="text-xs text-stone-500 mb-4">“诚心以此意，感通天地神”<br>默念所求之事，点击摇卦六次。</p>
+                <div class="flex justify-center gap-4 mb-4">
+                    <button id="btn-toss" onclick="tossCoin()" class="px-6 py-2 rounded font-bold bg-amber-700 hover:bg-amber-600 text-white transition-all">
+                        开始摇卦
+                    </button>
+                    <button onclick="resetCoins()" class="px-4 py-2 border border-stone-600 rounded hover:bg-stone-700 text-sm">重置</button>
+                </div>
+                <!-- 铜钱显示区域 -->
+                <div id="coin-display" class="flex flex-col-reverse items-center min-h-[160px] bg-stone-900 rounded p-2 border border-stone-700">
+                    <span class="text-stone-600 my-auto text-sm">等待起卦...</span>
+                </div>
+            </div>
+
+            <!-- 八字面板 -->
+            <div id="panel-bazi" class="hidden space-y-4">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="block text-xs text-stone-400 mb-1">出生日期</label>
+                        <input type="date" id="birthDate" class="w-full bg-stone-900 border border-stone-700 rounded p-2 text-sm text-white scheme-dark">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-stone-400 mb-1">出生时间</label>
+                        <input type="time" id="birthTime" class="w-full bg-stone-900 border border-stone-700 rounded p-2 text-sm text-white scheme-dark">
+                    </div>
+                </div>
+                <div>
+                   <label class="block text-xs text-stone-400 mb-1">性别</label>
+                   <div class="flex gap-4">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="gender" value="male" checked class="accent-amber-500">
+                        <span class="text-sm">男 (乾)</span>
+                      </label>
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="gender" value="female" class="accent-amber-500">
+                        <span class="text-sm">女 (坤)</span>
+                      </label>
+                   </div>
+                </div>
+                <button onclick="generateBazi()" class="w-full bg-amber-700 hover:bg-amber-600 text-white font-bold py-3 rounded shadow-lg mt-2">
+                    生成命盘信息
+                </button>
+            </div>
+
+        </div>
+
+        <!-- 结果展示区域 -->
+        <div id="result-area" class="hidden bg-stone-900 border-t border-stone-700 p-6 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-amber-500 font-bold">【卦象已成】</h2>
+                <button onclick="copyResult()" class="text-xs flex items-center gap-1 bg-stone-800 hover:bg-stone-700 px-3 py-1 rounded border border-stone-600">
+                    <i class="fa-regular fa-copy"></i> 复制结果
+                </button>
+            </div>
+            
+            <div id="result-content" class="space-y-3 text-sm text-stone-300">
+                <!-- JS动态插入内容 -->
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-stone-700 text-xs text-stone-500 italic text-center">
+                “贫道王也，谨依卦象直言。吉凶在天，成事在人。”
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // --- 数据定义 ---
+    const TRIGRAMS = {
+        1: { name: '乾', nature: '天', element: '金', binary: '111' },
+        2: { name: '兑', nature: '泽', element: '金', binary: '011' },
+        3: { name: '离', nature: '火', element: '火', binary: '101' },
+        4: { name: '震', nature: '雷', element: '木', binary: '001' },
+        5: { name: '巽', nature: '风', element: '木', binary: '110' },
+        6: { name: '坎', nature: '水', element: '水', binary: '010' },
+        7: { name: '艮', nature: '山', element: '土', binary: '100' },
+        8: { name: '坤', nature: '地', element: '土', binary: '000' }
+    };
+
+    // 64卦简易吉凶速查表 (上卦索引-下卦索引)
+    // 格式：[上卦id][下卦id] = {name, luck, desc}
+    const HEX_DATA = {
+        1: { 
+            1: {name: "乾为天", luck: "上上卦", desc: "刚健中正，飞龙在天，万事亨通。"},
+            2: {name: "天泽履", luck: "中平卦", desc: "如履虎尾，小心谨慎则吉。"},
+            3: {name: "天火同人", luck: "中上卦", desc: "上下和同，谋事可成。"},
+            4: {name: "天雷无妄", luck: "下平卦", desc: "顺其自然，切勿妄动。"},
+            5: {name: "天风姤", luck: "下下卦", desc: "风云不测，阴阳相遇，防范小人。"},
+            6: {name: "天水讼", luck: "中下卦", desc: "争讼之事，止则为吉。"},
+            7: {name: "天山遁", luck: "下平卦", desc: "退避保身，待机而动。"},
+            8: {name: "天地否", luck: "下下卦", desc: "天地不交，闭塞不通。"}
+        },
+        2: {
+            1: {name: "泽天夬", luck: "中上卦", desc: "决断之时，刚毅果断。"},
+            2: {name: "兑为泽", luck: "上平卦", desc: "喜悦和悦，利于守正。"},
+            3: {name: "泽火革", luck: "中上卦", desc: "旧去新来，事有变革。"},
+            4: {name: "泽雷随", luck: "中平卦", desc: "随机应变，随遇而安。"},
+            5: {name: "泽风大过", luck: "下平卦", desc: "压力巨大，量力而行。"},
+            6: {name: "泽水困", luck: "下下卦", desc: "山穷水尽，困守待援。"},
+            7: {name: "泽山咸", luck: "中上卦", desc: "感应相通，诸事顺利。"},
+            8: {name: "泽地萃", luck: "中上卦", desc: "精英荟萃，利见大人。"}
+        },
+        3: {
+            1: {name: "火天大有", luck: "上上卦", desc: "日丽中天，盛大富有。"},
+            2: {name: "火泽睽", luck: "下平卦", desc: "二女同居，其志不同，乖离之象。"},
+            3: {name: "离为火", luck: "中上卦", desc: "光明附丽，柔顺为亨。"},
+            4: {name: "火雷噬嗑", luck: "中平卦", desc: "咬碎硬骨，刑罚除恶。"},
+            5: {name: "火风鼎", luck: "上上卦", desc: "去旧取新，三足鼎立，稳重之象。"},
+            6: {name: "火水未济", luck: "中下卦", desc: "事未完结，尚需努力。"},
+            7: {name: "火山旅", luck: "下平卦", desc: "羁旅漂泊，小亨之象。"},
+            8: {name: "火地晋", luck: "中上卦", desc: "旭日东升，步步高升。"}
+        },
+        4: {
+            1: {name: "雷天大壮", luck: "中上卦", desc: "声势壮大，切勿冲动。"},
+            2: {name: "雷泽归妹", luck: "下平卦", desc: "名不正言不顺，事多浮沉。"},
+            3: {name: "雷火丰", luck: "上上卦", desc: "日中则昃，盛大之时，宜守成。"},
+            4: {name: "震为雷", luck: "中平卦", desc: "震惊百里，修身省过。"},
+            5: {name: "雷风恒", luck: "中上卦", desc: "持之以恒，长久之象。"},
+            6: {name: "雷水解", luck: "中上卦", desc: "患难解除，雨过天晴。"},
+            7: {name: "雷山小过", luck: "下平卦", desc: "小有过越，宜下不宜上。"},
+            8: {name: "雷地豫", luck: "中上卦", desc: "顺理而动，快乐安逸。"}
+        },
+        5: {
+            1: {name: "风天小畜", luck: "下平卦", desc: "密云不雨，积蓄力量。"},
+            2: {name: "风泽中孚", luck: "上上卦", desc: "诚信感通，心诚则灵。"},
+            3: {name: "风火家人", luck: "上平卦", desc: "家庭和睦，各尽其职。"},
+            4: {name: "风雷益", luck: "上上卦", desc: "损上益下，大有裨益。"},
+            5: {name: "巽为风", luck: "中平卦", desc: "顺风而行，谦逊获益。"},
+            6: {name: "风水涣", luck: "下平卦", desc: "冰雪消融，离散之象，宜收拢人心。"},
+            7: {name: "风山渐", luck: "上上卦", desc: "循序渐进，积少成多。"},
+            8: {name: "风地观", luck: "中平卦", desc: "观摩视察，静观其变。"}
+        },
+        6: {
+            1: {name: "水天需", luck: "中上卦", desc: "云在天上，需待时机。"},
+            2: {name: "水泽节", luck: "上平卦", desc: "适度节制，苦尽甘来。"},
+            3: {name: "水火既济", luck: "中上卦", desc: "功德圆满，万事大吉。"},
+            4: {name: "水雷屯", luck: "下下卦", desc: "万事起头难，如苗初生。"},
+            5: {name: "水风井", luck: "中平卦", desc: "修井汲水，养德利民。"},
+            6: {name: "坎为水", luck: "下下卦", desc: "重重险陷，守正待时。"},
+            7: {name: "水山蹇", luck: "下下卦", desc: "山高水远，寸步难行。"},
+            8: {name: "水地比", luck: "上上卦", desc: "亲密比辅，贵人相助。"}
+        },
+        7: {
+            1: {name: "山天大畜", luck: "中上卦", desc: "积聚大德，时机大成。"},
+            2: {name: "山泽损", luck: "下平卦", desc: "损己利人，先难后易。"},
+            3: {name: "山火贲", luck: "中平卦", desc: "文饰光彩，小利有攸往。"},
+            4: {name: "山雷颐", luck: "中平卦", desc: "颐养身心，病从口入。"},
+            5: {name: "山风蛊", luck: "中下卦", desc: "物腐虫生，整顿改革。"},
+            6: {name: "山水蒙", luck: "中下卦", desc: "蒙昧不明，启蒙教育。"},
+            7: {name: "艮为山", luck: "中平卦", desc: "动静失宜，宜止则止。"},
+            8: {name: "山地剥", luck: "下下卦", desc: "剥落之象，小人得势。"}
+        },
+        8: {
+            1: {name: "地天泰", luck: "上上卦", desc: "天地交泰，事事通顺。"},
+            2: {name: "地泽临", luck: "上平卦", desc: "居高临下，大驾光临。"},
+            3: {name: "地火明夷", luck: "下下卦", desc: "光明受损，晦暗之象。"},
+            4: {name: "地雷复", luck: "中上卦", desc: "剥极而复，春回大地。"},
+            5: {name: "地风升", luck: "上上卦", desc: "如木在土，积小成高。"},
+            6: {name: "地水师", luck: "中上卦", desc: "兴师动众，老成持重。"},
+            7: {name: "地山谦", luck: "上上卦", desc: "谦虚受益，万事大吉。"},
+            8: {name: "坤为地", luck: "上上卦", desc: "厚德载物，顺势而为。"}
+        }
+    };
+
+    // --- 全局状态 ---
+    let currentTab = 'meihua';
+    let coins = [];
+    let isTossing = false;
+    let currentResult = null;
+
+    // --- 界面逻辑 ---
+    function switchTab(tab) {
+        currentTab = tab;
+        // 按钮样式重置
+        ['meihua', 'coin', 'bazi'].forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            const panel = document.getElementById(`panel-${t}`);
+            if (t === tab) {
+                btn.className = "flex-1 p-3 text-sm flex items-center justify-center gap-2 bg-stone-800 text-amber-500 border-b-2 border-amber-500 transition-colors";
+                panel.classList.remove('hidden');
+            } else {
+                btn.className = "flex-1 p-3 text-sm flex items-center justify-center gap-2 bg-stone-900 text-stone-500 border-b-2 border-transparent transition-colors";
+                panel.classList.add('hidden');
+            }
+        });
+        document.getElementById('result-area').classList.add('hidden');
+        currentResult = null;
+    }
+
+    // --- 渲染辅助 ---
+    function getHexagramInfo(upper, lower) {
+        if(HEX_DATA[upper] && HEX_DATA[upper][lower]) {
+            return HEX_DATA[upper][lower];
+        }
+        return { name: "未知卦", luck: "平", desc: "天机难测" };
+    }
+
+    function renderTrigram(num, label) {
+        const tri = TRIGRAMS[num];
+        let linesHtml = tri.binary.split('').map(bit => {
+            if(bit === '1') return `<div class="trigram-line yang"></div>`;
+            return `<div class="trigram-line yin"><span></span><span></span></div>`;
+        }).join('');
+        
+        return `
+            <div class="flex flex-col items-center p-2 border border-stone-600 rounded bg-stone-800 w-24">
+                <div class="text-xs text-stone-500 mb-1">${label}</div>
+                <div class="text-xl font-bold text-amber-500 mb-1">${tri.nature} (${tri.name})</div>
+                <div class="w-12 flex flex-col">${linesHtml}</div>
+                <div class="text-xs text-stone-400 mt-1">五行: ${tri.element}</div>
+            </div>
+        `;
+    }
+
+    // --- 业务逻辑：梅花易数 ---
+    function calculateMeihua() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const hour = now.getHours();
+
+        // 简易起卦算法
+        const upperNum = (year + month + day) % 8 || 8;
+        const lowerNum = (year + month + day + hour) % 8 || 8;
+        const movingYao = (year + month + day + hour) % 6 || 6;
+
+        const hexInfo = getHexagramInfo(upperNum, lowerNum);
+        const name = document.getElementById('username').value || "有缘人";
+        const query = document.getElementById('query').value || "未问何事";
+
+        const html = `
+            <p><span class="text-stone-500">缘主：</span> ${name}</p>
+            <p><span class="text-stone-500">问事：</span> ${query}</p>
+            <p><span class="text-stone-500">时间：</span> ${now.toLocaleString()}</p>
+            
+            <div class="bg-stone-800 p-4 rounded border border-stone-600 my-4 text-center">
+                <h3 class="text-2xl text-amber-500 font-bold mb-1">${hexInfo.name}</h3>
+                <span class="inline-block bg-amber-900 text-amber-100 text-xs px-2 py-1 rounded mb-2 border border-amber-700">${hexInfo.luck}</span>
+                <p class="text-stone-300 italic">“${hexInfo.desc}”</p>
+            </div>
+
+            <div class="flex justify-center gap-4 my-4">
+                ${renderTrigram(upperNum, '上卦')}
+                ${renderTrigram(lowerNum, '下卦')}
+            </div>
+            
+            <div class="text-center text-xs text-stone-500">
+                <p>动爻：第 ${movingYao} 爻</p>
+                <p>体卦属${TRIGRAMS[upperNum].element}，用卦属${TRIGRAMS[lowerNum].element}</p>
+            </div>
+        `;
+
+        showResult(html, `【梅花】${hexInfo.name} - ${hexInfo.luck}`);
+    }
+
+    // --- 业务逻辑：六爻摇卦 ---
+    function tossCoin() {
+        if(coins.length >= 6 || isTossing) return;
+        isTossing = true;
+        const btn = document.getElementById('btn-toss');
+        btn.innerText = "摇卦中...";
+        btn.classList.add("opacity-50");
+
+        setTimeout(() => {
+            // 模拟摇卦 (简单概率：0为阴，1为阳)
+            // 实际算法：随机生成6,7,8,9
+            // 简易版：随机3枚硬币，花为3，字为2
+            // 3+3+3=9(老阳O), 3+3+2=8(少阴--), 3+2+2=7(少阳---), 2+2+2=6(老阴X)
+            const c1 = Math.random() > 0.5 ? 3 : 2;
+            const c2 = Math.random() > 0.5 ? 3 : 2;
+            const c3 = Math.random() > 0.5 ? 3 : 2;
+            const sum = c1 + c2 + c3;
+            
+            coins.push(sum);
+            renderCoins();
+            
+            isTossing = false;
+            if (coins.length < 6) {
+                btn.innerText = `摇第 ${coins.length + 1} 爻`;
+                btn.classList.remove("opacity-50");
+            } else {
+                btn.innerText = "卦象已成";
+                btn.classList.add("bg-stone-700", "cursor-not-allowed");
+                analyzeCoins();
+            }
+        }, 600);
+    }
+
+    function renderCoins() {
+        const display = document.getElementById('coin-display');
+        display.innerHTML = '';
+        if(coins.length === 0) {
+            display.innerHTML = '<span class="text-stone-600 my-auto text-sm">等待起卦...</span>';
+            return;
+        }
+        
+        // 六爻是从下往上排，所以显示时我们要倒序遍历来配合 flex-col-reverse 或者直接插入
+        // 这里 coins[0] 是初爻(最下面)，coins[5] 是上爻(最上面)
+        // flex-col-reverse 会把第一个子元素放在最下面，正好符合 coins.map 的顺序
+        
+        coins.forEach((val, idx) => {
+            let symbolHtml = '';
+            let label = '';
+            // 6:老阴(X), 7:少阳(---), 8:少阴(--), 9:老阳(O)
+            if(val === 7 || val === 9) { // 阳
+                 symbolHtml = `<div class="h-2 w-24 bg-amber-500 relative flex justify-center items-center">${val===9 ? '<span class="text-red-900 font-bold text-xs absolute">O</span>' : ''}</div>`;
+                 label = val === 9 ? '老阳' : '少阳';
+            } else { // 阴
+                 symbolHtml = `<div class="flex justify-between w-24"><div class="h-2 w-10 bg-stone-400"></div><div class="h-2 w-10 bg-stone-400"></div>${val===6 ? '<span class="absolute left-1/2 -ml-1 text-red-500 font-bold text-xs">X</span>' : ''}</div>`;
+                 label = val === 6 ? '老阴' : '少阴';
+            }
+
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-4 my-1 w-full justify-center";
+            row.innerHTML = `
+                <span class="text-xs text-stone-500 w-8 text-right">爻${idx+1}</span>
+                ${symbolHtml}
+                <span class="text-xs text-stone-600 w-8">${label}</span>
+            `;
+            display.appendChild(row);
+        });
+    }
+
+    function analyzeCoins() {
+        // 将6爻转化为本卦（不看动爻变卦，仅为简化吉凶判断，取本卦）
+        // 7,9 -> 1 (阳); 6,8 -> 0 (阴)
+        // 数组：[初, 二, 三, 四, 五, 上]
+        // 下卦：coins[0], coins[1], coins[2]
+        // 上卦：coins[3], coins[4], coins[5]
+        
+        const getTrigramNum = (c1, c2, c3) => {
+            const b1 = (c1===7||c1===9) ? '1' : '0';
+            const b2 = (c2===7||c2===9) ? '1' : '0';
+            const b3 = (c3===7||c3===9) ? '1' : '0';
+            const binary = b3 + b2 + b1; // 二进制顺序：上爻在中，中爻在中，初爻在右(低位)？
+            // 修正：TRIGRAMS binary 是 '111' (上中下)
+            // 这里 c3 是该卦的最上爻。
+            // 例如 乾卦：c3(阳), c2(阳), c1(阳) -> '111'
+            // 查表
+            for(let key in TRIGRAMS) {
+                if(TRIGRAMS[key].binary === binary) return key;
+            }
+            return 8; // Default 坤
+        };
+
+        const lowerNum = getTrigramNum(coins[0], coins[1], coins[2]);
+        const upperNum = getTrigramNum(coins[3], coins[4], coins[5]);
+        
+        const hexInfo = getHexagramInfo(upperNum, lowerNum);
+        const name = document.getElementById('username').value || "有缘人";
+        const query = document.getElementById('query').value || "未问何事";
+
+        const html = `
+            <p><span class="text-stone-500">缘主：</span> ${name}</p>
+            <p><span class="text-stone-500">问事：</span> ${query}</p>
+            
+            <div class="bg-stone-800 p-4 rounded border border-stone-600 my-4 text-center">
+                <h3 class="text-2xl text-amber-500 font-bold mb-1">${hexInfo.name}</h3>
+                <span class="inline-block bg-amber-900 text-amber-100 text-xs px-2 py-1 rounded mb-2 border border-amber-700">${hexInfo.luck}</span>
+                <p class="text-stone-300 italic">“${hexInfo.desc}”</p>
+                <p class="text-xs text-stone-500 mt-2">(此为本卦断语，变爻详情请咨询道长)</p>
+            </div>
+            
+            <div class="text-xs text-stone-500 text-center">
+                <p>六爻金钱课重在“动静”，如有动爻(老阴老阳)，事态将变。</p>
+            </div>
+        `;
+        
+        showResult(html, `【六爻】${hexInfo.name} - ${hexInfo.luck}`);
+    }
+
+    function resetCoins() {
+        coins = [];
+        isTossing = false;
+        document.getElementById('coin-display').innerHTML = '<span class="text-stone-600 my-auto text-sm">等待起卦...</span>';
+        const btn = document.getElementById('btn-toss');
+        btn.innerText = "开始摇卦";
+        btn.classList.remove("bg-stone-700", "cursor-not-allowed", "opacity-50");
+        document.getElementById('result-area').classList.add('hidden');
+        currentResult = null;
+    }
+
+    // --- 业务逻辑：八字 ---
+    function generateBazi() {
+        const date = document.getElementById('birthDate').value;
+        const time = document.getElementById('birthTime').value;
+        if(!date || !time) {
+            alert("请填写完整的生辰信息，贫道方可排盘。");
+            return;
+        }
+        
+        const name = document.getElementById('username').value || "有缘人";
+        const gender = document.querySelector('input[name="gender"]:checked').parentElement.innerText;
+
+        const html = `
+            <p><span class="text-stone-500">缘主：</span> ${name}</p>
+            <p><span class="text-stone-500">乾坤：</span> ${gender}</p>
+            <div class="bg-stone-800 p-3 rounded border border-stone-700 text-center my-4">
+                <p class="text-amber-500 mb-1">公历 ${date} ${time}</p>
+                <p class="text-xs text-stone-500">八字排盘需结合节气与真太阳时，<br>请复制信息发给道长详批。</p>
+            </div>
+        `;
+        showResult(html, `【八字】${name} - ${gender} - ${date} ${time}`);
+    }
+
+    // --- 公共结果处理 ---
+    function showResult(htmlContent, textSummary) {
+        const resultArea = document.getElementById('result-area');
+        const contentDiv = document.getElementById('result-content');
+        contentDiv.innerHTML = htmlContent;
+        resultArea.classList.remove('hidden');
+        currentResult = textSummary; // 保存用于复制的文本摘要
+    }
+
+    function copyResult() {
+        if(!currentResult) return;
+        const name = document.getElementById('username').value || "有缘人";
+        const query = document.getElementById('query').value || "未问何事";
+        
+        // 构建详细的复制文本
+        let text = `【求测人】${name}\n【问事】${query}\n`;
+        
+        if (currentTab === 'meihua') {
+            text += `${currentResult}\n`; // currentResult 包含了卦名和吉凶
+        } else if (currentTab === 'coin') {
+             text += `${currentResult}\n`;
+             text += `【爻象】(底->顶): ${coins.map(c=> c===6?'老阴':c===7?'少阳':c===8?'少阴':'老阳').join(',')}\n`;
+        } else {
+             text += `${currentResult}\n`;
+        }
+        text += `请王道长慈悲解惑。`;
+
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            alert('卦象信息已复制！请粘贴给王道长。');
+        } catch (err) {
+            alert('复制失败，请手动截图。');
+        }
+        document.body.removeChild(textarea);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana Sanctum - Digital Tarot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400&family=Noto+Serif+SC:wght@400;700&display=swap');
+
+        body {
+            background-color: #0f0c1a;
+            background-image: radial-gradient(circle at 50% 50%, #1a1429 0%, #050505 100%);
+            color: #e2d1f0;
+            font-family: 'Lato', 'Noto Serif SC', sans-serif;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, .arcana-font {
+            font-family: 'Cinzel', serif;
+        }
+        
+        .cn-font {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        /* Wrapper: Handles the entrance animation and 3D space */
+        .card-wrapper {
+            width: 170px;
+            height: 280px;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        /* The Flipping Element */
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+        }
+
+        .card:hover {
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
+            transform: translateY(-5px) rotateX(5deg);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Faces */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; 
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #4a3b69;
+            pointer-events: none; 
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #1a0b2e 0%, #0d0616 100%);
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(157, 142, 194, 0.1) 2px, transparent 2.5px),
+                linear-gradient(0deg, transparent 49%, rgba(212, 175, 55, 0.1) 50%, transparent 51%),
+                linear-gradient(90deg, transparent 49%, rgba(212, 175, 55, 0.1) 50%, transparent 51%);
+            background-size: 20px 20px, 100% 100%, 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .card-front {
+            background: #fdfbf7; 
+            color: #1a0b2e;
+            transform: rotateY(180deg);
+            border: 4px solid #b8860b; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        
+        .card.reversed .card-inner-content {
+            transform: rotate(180deg);
+        }
+
+        .glow-btn {
+            box-shadow: 0 0 10px #5b21b6, 0 0 20px #5b21b6 inset;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .glow-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
+        }
+        
+        .glow-btn:hover::after {
+            left: 100%;
+            opacity: 1;
+        }
+
+        .mystic-border {
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(10, 5, 20, 0.7);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .fade-in { animation: fadeIn 1s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Quick Meaning Box Style */
+        .meaning-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #b8860b;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Polarity Badges */
+        .badge-ji { background-color: rgba(234, 179, 8, 0.2); color: #fbbf24; border: 1px solid #b45309; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 8px; display: inline-block; }
+        .badge-xiong { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #991b1b; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 8px; display: inline-block; }
+        .badge-ping { background-color: rgba(156, 163, 175, 0.2); color: #d1d5db; border: 1px solid #4b5563; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right: 8px; display: inline-block; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0c1a; }
+        ::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6d28d9; }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 selection:bg-purple-900 selection:text-white">
+
+    <!-- Header -->
+    <header class="text-center mb-8 mt-6 z-10">
+        <div class="text-xs tracking-[0.5em] text-yellow-600 mb-2 uppercase">The Arcana Master Presents</div>
+        <h1 class="text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-b from-purple-200 to-purple-800 mb-2 font-bold tracking-wider drop-shadow-lg" style="font-family: 'Cinzel', serif;">ARCANA SANCTUM</h1>
+        <p class="text-gray-400 italic text-sm md:text-base max-w-lg mx-auto cn-font border-t border-gray-800 pt-4 mt-2">
+            "意念是骑手，战车是意志。" <br> <span class="text-xs text-gray-600 not-italic">- Aleister Crowley</span>
+        </p>
+    </header>
+
+    <!-- Controls -->
+    <div id="setup-panel" class="w-full max-w-2xl mb-8 flex flex-col items-center gap-8 z-10 fade-in">
+        
+        <!-- Spread Selection -->
+        <div class="mystic-border p-8 rounded-xl w-full text-center relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
+            
+            <h2 class="text-2xl text-yellow-500 mb-6 arcana-font">Choose Your Spread <span class="text-sm block text-gray-500 mt-1 cn-font font-normal">选择牌阵</span></h2>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <button onclick="selectSpread('single')" id="btn-single" class="relative px-8 py-4 rounded-lg border border-purple-500 bg-purple-900/40 transition-all duration-300 hover:scale-105 group-hover:shadow-[0_0_20px_rgba(124,58,237,0.2)]">
+                    <div class="text-lg font-bold arcana-font text-purple-100">Single Card</div>
+                    <div class="text-sm text-gray-400 cn-font mt-1">单张 · 每日指引</div>
+                </button>
+                
+                <button onclick="selectSpread('three')" id="btn-three" class="relative px-8 py-4 rounded-lg border border-gray-700 bg-gray-900/40 transition-all duration-300 hover:scale-105 hover:border-purple-500">
+                    <div class="text-lg font-bold arcana-font text-purple-100">Three Cards</div>
+                    <div class="text-sm text-gray-400 cn-font mt-1">圣三角 · 过去/现在/未来</div>
+                </button>
+                
+                 <button onclick="selectSpread('celtic')" id="btn-celtic" class="relative px-8 py-4 rounded-lg border border-gray-700 bg-gray-900/40 transition-all duration-300 hover:scale-105 hover:border-purple-500">
+                    <div class="text-lg font-bold arcana-font text-purple-100">Cross</div>
+                    <div class="text-sm text-gray-400 cn-font mt-1">小十字 · 深度分析</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Input for Intent -->
+        <div class="w-full relative">
+            <input type="text" id="user-intent" placeholder="Focus your mind: What do you seek? (请输入你的问题)" 
+                class="w-full bg-black/30 border border-gray-700 rounded-lg py-3 px-4 text-center text-purple-200 placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition cn-font">
+        </div>
+
+        <!-- Action Button -->
+        <button id="draw-btn" onclick="startReading()" class="glow-btn bg-gradient-to-r from-indigo-900 to-purple-900 text-white px-10 py-4 rounded-full text-xl font-bold tracking-[0.2em] arcana-font flex items-center gap-3 border border-purple-500/50">
+            <span>🔮</span> CONSULT THE ETHER <span class="text-sm font-normal opacity-70 cn-font tracking-normal ml-2">开启仪式</span>
+        </button>
+    </div>
+
+    <!-- Reading Area (Hidden initially) -->
+    <div id="reading-area" class="w-full max-w-7xl hidden flex-col items-center min-h-[60vh]">
+        
+        <!-- Cards Display -->
+        <div id="cards-container" class="card-container flex flex-wrap justify-center gap-8 md:gap-12 mb-12 py-10">
+            <!-- Cards will be injected here -->
+        </div>
+
+        <!-- Result Panel -->
+        <div id="result-panel" class="hidden w-full max-w-3xl mystic-border p-8 rounded-xl text-center fade-in mb-20">
+            <h3 class="text-3xl text-yellow-500 mb-2 arcana-font">The Cards Have Spoken</h3>
+            
+            <!-- Dynamic Quick Meaning Display -->
+            <div id="quick-meaning-container" class="hidden">
+                <div class="meaning-box">
+                    <h4 class="text-yellow-500 font-bold mb-1 cn-font text-lg">✨ 快速指引 (Quick Insight)</h4>
+                    <p id="quick-meaning-text" class="text-gray-200 cn-font text-base leading-relaxed flex items-center"></p>
+                </div>
+            </div>
+
+            <p class="mb-6 text-gray-400 cn-font text-sm">
+                原型已经显现。请点击下方按钮复制完整信息，并发送给 <strong>The Arcana Master</strong> 进行深度四层解读。
+            </p>
+            
+            <div class="relative group">
+                <div id="output-text" class="bg-black/60 p-6 rounded-lg text-left font-mono text-xs md:text-sm text-green-400 mb-6 h-48 overflow-y-auto select-all border border-gray-800 shadow-inner">
+                </div>
+                <div class="absolute top-2 right-2 text-xs text-gray-600 pointer-events-none">RAW DATA</div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button onclick="copyToClipboard()" class="bg-yellow-700 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    <span>Copy Result (复制结果)</span>
+                </button>
+                <button onclick="resetApp()" class="border border-gray-600 hover:bg-gray-800 text-gray-300 py-3 px-8 rounded transition cursor-pointer">
+                    New Reading (重新抽牌)
+                </button>
+            </div>
+            <div id="copy-feedback" class="text-purple-400 text-sm mt-3 h-5 font-bold transition-opacity duration-300 opacity-0"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Data: The 78 Keys (Bilingual) ---
+        const suits = [
+            { id: 'Wands', en: 'Wands', cn: '权杖', element: 'Fire (火)', keywords: "行动, 热情, 创造" },
+            { id: 'Cups', en: 'Cups', cn: '圣杯', element: 'Water (水)', keywords: "情感, 关系, 直觉" },
+            { id: 'Swords', en: 'Swords', cn: '宝剑', element: 'Air (风)', keywords: "思维, 冲突, 真理" },
+            { id: 'Pentacles', en: 'Pentacles', cn: '星币', element: 'Earth (土)', keywords: "物质, 工作, 稳定" }
+        ];
+        
+        const ranks = [
+            { id: 'Ace', en: 'Ace', cn: '王牌 (1)', key: "新的开始, 潜力" },
+            { id: 'Two', en: 'Two', cn: '2', key: "平衡, 决定, 合作" },
+            { id: 'Three', en: 'Three', cn: '3', key: "成长, 表达, 团队" },
+            { id: 'Four', en: 'Four', cn: '4', key: "稳定, 停滞, 基础" },
+            { id: 'Five', en: 'Five', cn: '5', key: "冲突, 损失, 改变" },
+            { id: 'Six', en: 'Six', cn: '6', key: "和谐, 回忆, 帮助" },
+            { id: 'Seven', en: 'Seven', cn: '7', key: "评估, 幻想, 策略" },
+            { id: 'Eight', en: 'Eight', cn: '8', key: "移动, 力量, 细节" },
+            { id: 'Nine', en: 'Nine', cn: '9', key: "满足, 极致, 孤独" },
+            { id: 'Ten', en: 'Ten', cn: '10', key: "完成, 循环, 重担" },
+            { id: 'Page', en: 'Page', cn: '侍从', key: "新消息, 学习, 孩子气" },
+            { id: 'Knight', en: 'Knight', cn: '骑士', key: "行动, 追求, 冲动" },
+            { id: 'Queen', en: 'Queen', cn: '王后', key: "滋养, 理解, 内在力量" },
+            { id: 'King', en: 'King', cn: '国王', key: "掌控, 权威, 外在成就" }
+        ];
+
+        // Specific Major Arcana Meanings with Polarity
+        // pUp = Polarity Upright (1:吉, -1:凶, 0:平)
+        // pRev = Polarity Reversed
+        const majorMeanings = {
+            0: { up: "新的旅程, 纯真, 自由", rev: "鲁莽, 愚蠢, 风险", pUp: 1, pRev: -1 },
+            1: { up: "创造力, 技能, 显化", rev: "欺骗, 意志薄弱, 混乱", pUp: 1, pRev: -1 },
+            2: { up: "直觉, 潜意识, 神秘", rev: "秘密被揭露, 压抑直觉", pUp: 1, pRev: -1 },
+            3: { up: "丰盛, 母性, 自然", rev: "依赖, 创造力受阻, 奢侈", pUp: 1, pRev: -1 },
+            4: { up: "权威, 结构, 父亲形象", rev: "暴政, 僵化, 缺乏纪律", pUp: 1, pRev: -1 },
+            5: { up: "传统, 信仰, 教育", rev: "叛逆, 盲从, 新的信念", pUp: 1, pRev: -1 },
+            6: { up: "爱, 和谐, 选择", rev: "不平衡, 分离, 错误的选择", pUp: 1, pRev: -1 },
+            7: { up: "胜利, 意志力, 掌控", rev: "失控, 暴力, 缺乏方向", pUp: 1, pRev: -1 },
+            8: { up: "勇气, 仁慈, 内在力量", rev: "软弱, 恐惧, 自我怀疑", pUp: 1, pRev: -1 },
+            9: { up: "内省, 孤独, 指引", rev: "孤僻, 拒绝建议, 迷失", pUp: 0, pRev: -1 },
+            10: { up: "命运转折, 业力, 机会", rev: "坏运气, 抵抗改变, 停滞", pUp: 1, pRev: -1 },
+            11: { up: "公正, 真理, 因果", rev: "不公, 偏见, 逃避责任", pUp: 1, pRev: -1 },
+            12: { up: "牺牲, 新视角, 等待", rev: "徒劳的牺牲, 拖延, 停滞", pUp: 0, pRev: -1 },
+            13: { up: "结束, 转变, 重生", rev: "抗拒改变, 停滞不前, 恐惧", pUp: 0, pRev: -1 },
+            14: { up: "平衡, 节制, 融合", rev: "失衡, 极端, 过度", pUp: 1, pRev: -1 },
+            15: { up: "束缚, 物质主义, 诱惑", rev: "打破束缚, 觉醒, 面对阴影", pUp: -1, pRev: 0 },
+            16: { up: "突变, 毁灭, 启示", rev: "避免灾难, 恐惧改变, 重建", pUp: -1, pRev: -1 },
+            17: { up: "希望, 灵感, 宁静", rev: "失望, 悲观, 缺乏信心", pUp: 1, pRev: -1 },
+            18: { up: "幻觉, 潜意识, 不安", rev: "恐惧释放, 混乱, 揭露真相", pUp: -1, pRev: 0 },
+            19: { up: "快乐, 成功, 活力", rev: "悲伤, 暂时失败, 虚荣", pUp: 1, pRev: 0 },
+            20: { up: "审判, 觉醒, 召唤", rev: "自我怀疑, 拒绝召唤, 悔恨", pUp: 1, pRev: -1 },
+            21: { up: "圆满, 完成, 整合", rev: "未完成, 缺乏闭环, 遗憾", pUp: 1, pRev: -1 }
+        };
+
+        const majorArcana = [
+            { id: 0, en: 'The Fool', cn: '愚人' },
+            { id: 1, en: 'The Magician', cn: '魔术师' },
+            { id: 2, en: 'The High Priestess', cn: '女祭司' },
+            { id: 3, en: 'The Empress', cn: '皇后' },
+            { id: 4, en: 'The Emperor', cn: '皇帝' },
+            { id: 5, en: 'The Hierophant', cn: '教皇' },
+            { id: 6, en: 'The Lovers', cn: '恋人' },
+            { id: 7, en: 'The Chariot', cn: '战车' },
+            { id: 8, en: 'Strength', cn: '力量' },
+            { id: 9, en: 'The Hermit', cn: '隐士' },
+            { id: 10, en: 'Wheel of Fortune', cn: '命运之轮' },
+            { id: 11, en: 'Justice', cn: '正义' },
+            { id: 12, en: 'The Hanged Man', cn: '倒吊人' },
+            { id: 13, en: 'Death', cn: '死神' },
+            { id: 14, en: 'Temperance', cn: '节制' },
+            { id: 15, en: 'The Devil', cn: '恶魔' },
+            { id: 16, en: 'The Tower', cn: '高塔' },
+            { id: 17, en: 'The Star', cn: '星星' },
+            { id: 18, en: 'The Moon', cn: '月亮' },
+            { id: 19, en: 'The Sun', cn: '太阳' },
+            { id: 20, en: 'Judgement', cn: '审判' },
+            { id: 21, en: 'The World', cn: '世界' }
+        ];
+
+        let deck = [];
+        let currentSpread = 'single';
+        let drawnCards = [];
+        let isReading = false;
+        let revealedCount = 0; 
+
+        // --- Helper: Generate Interpretation & Polarity ---
+        function getCardInsight(card) {
+            let polarityCode = 0; // 0:Neutral, 1:Good, -1:Bad
+            let meaningText = "";
+            let polarityLabel = "";
+            let badgeClass = "";
+
+            if (card.type === 'Major') {
+                const meanings = majorMeanings[card.id];
+                meaningText = card.isReversed ? meanings.rev : meanings.up;
+                polarityCode = card.isReversed ? meanings.pRev : meanings.pUp;
+            } else {
+                // Minor Arcana Logic Simplification
+                // General Rule: Swords usually challenging (-1). 
+                // 5s are usually challenging (-1).
+                // 3 of Swords, 9 of Swords, 10 of Swords, 10 of Wands are challenging.
+                // Reversals flip polarity or make it internal (often coded as -1 or 0).
+                
+                const rankId = ranks.find(r => card.nameEn.startsWith(r.en)).id;
+                const suitId = suits.find(s => card.nameEn.includes(s.en)).id;
+                const rankInfo = ranks.find(r => r.id === rankId);
+                const suitInfo = suits.find(s => s.id === suitId);
+                
+                let baseMeaning = `${suitInfo.cn} (${suitInfo.keywords}) + ${rankInfo.cn} (${rankInfo.key})`;
+                
+                // --- Simple Polarity Logic ---
+                polarityCode = 1; // Default Good
+
+                // Check Suit
+                if (suitId === 'Swords') polarityCode = 0; // Swords are generally heavy/neutral
+
+                // Check Rank Overrides
+                if (rankId === 'Five') polarityCode = -1; // 5s are conflict/loss
+                if (suitId === 'Swords' && (rankId === 'Three' || rankId === 'Nine' || rankId === 'Ten')) polarityCode = -1;
+                if (suitId === 'Wands' && rankId === 'Ten') polarityCode = -1; // Burden
+                if (suitId === 'Pentacles' && rankId === 'Five') polarityCode = -1; // Poverty
+
+                // Check Reversal
+                if (card.isReversed) {
+                    if (polarityCode === 1) polarityCode = -1; // Good becomes Bad/Blocked
+                    else if (polarityCode === -1) polarityCode = -1; // Bad stays Bad (or gets worse)
+                    else polarityCode = -1; // Neutral becomes Negative/Blocked
+                    meaningText = `(逆位) ${baseMeaning} - 能量受阻或延迟`;
+                } else {
+                    meaningText = `(正位) ${baseMeaning}`;
+                }
+            }
+
+            // Map Code to Label/Class
+            if (polarityCode === 1) {
+                polarityLabel = "吉";
+                badgeClass = "badge-ji";
+            } else if (polarityCode === -1) {
+                polarityLabel = "凶";
+                badgeClass = "badge-xiong";
+            } else {
+                polarityLabel = "平";
+                badgeClass = "badge-ping";
+            }
+
+            return { text: meaningText, label: polarityLabel, badgeClass: badgeClass, polarityText: polarityLabel === '吉' ? 'Good' : (polarityLabel === '凶' ? 'Challenging' : 'Neutral') };
+        }
+
+        // --- Initialization ---
+        function buildDeck() {
+            deck = [];
+            // Add Majors
+            majorArcana.forEach(card => {
+                deck.push({ 
+                    id: card.id,
+                    nameEn: card.en, 
+                    nameCn: card.cn, 
+                    fullName: `${card.id} - ${card.en}`, 
+                    type: 'Major', 
+                    displaySuit: 'Major Arcana' 
+                });
+            });
+            // Add Minors
+            suits.forEach(suit => {
+                ranks.forEach(rank => {
+                    deck.push({ 
+                        nameEn: `${rank.en} of ${suit.en}`, 
+                        nameCn: `${suit.cn} ${rank.cn}`,
+                        fullName: `${rank.en} of ${suit.en}`, 
+                        type: 'Minor', 
+                        suit: suit.en,
+                        suitCn: suit.cn,
+                        displaySuit: suit.en 
+                    });
+                });
+            });
+        }
+
+        function selectSpread(type) {
+            if(isReading) return;
+            currentSpread = type;
+            
+            // Reset styles
+            ['btn-single', 'btn-three', 'btn-celtic'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.className = "relative px-8 py-4 rounded-lg border border-gray-700 bg-gray-900/40 transition-all duration-300 hover:scale-105 hover:border-purple-500 cursor-pointer";
+            });
+
+            // Set Active
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.className = "relative px-8 py-4 rounded-lg border border-purple-500 bg-purple-900/60 shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all duration-300 scale-105 cursor-pointer";
+        }
+
+        // --- The Shuffle (Fisher-Yates) ---
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        // --- Logic ---
+        function startReading() {
+            const intent = document.getElementById('user-intent').value;
+            if(!intent && !confirm("No question entered. The cards will read your general aura. Proceed? (未输入问题，将读取整体气场。继续？)")) {
+                return;
+            }
+
+            isReading = true;
+            revealedCount = 0; 
+            buildDeck();
+            shuffleDeck();
+            drawnCards = [];
+            
+            let count = 1;
+            if(currentSpread === 'three') count = 3;
+            if(currentSpread === 'celtic') count = 5; 
+            
+            // Draw cards
+            for(let i=0; i<count; i++) {
+                const card = deck[i];
+                // 30% chance of reversal
+                card.isReversed = Math.random() < 0.3; 
+                drawnCards.push(card);
+            }
+
+            // UI Transitions
+            const setupPanel = document.getElementById('setup-panel');
+            const readingArea = document.getElementById('reading-area');
+            
+            setupPanel.style.opacity = '0';
+            setTimeout(() => {
+                setupPanel.classList.add('hidden');
+                readingArea.classList.remove('hidden');
+                readingArea.classList.add('flex');
+                renderCards();
+            }, 500);
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            drawnCards.forEach((card, index) => {
+                // Position logic
+                let positionLabel = "";
+                let positionDesc = "";
+                
+                if (currentSpread === 'three') {
+                    if (index === 0) { positionLabel = "Past"; positionDesc = "过去 / 起因"; }
+                    if (index === 1) { positionLabel = "Present"; positionDesc = "现在 / 行动"; }
+                    if (index === 2) { positionLabel = "Future"; positionDesc = "未来 / 结果"; }
+                } else if (currentSpread === 'celtic') {
+                    const titles = ["Core", "Obstacle", "Advice", "Hopes", "Outcome"];
+                    const descs = ["核心现状", "挑战/阻碍", "建议指引", "希望/恐惧", "最终结果"];
+                    positionLabel = titles[index];
+                    positionDesc = descs[index];
+                } else {
+                    positionLabel = "The Guidance";
+                    positionDesc = "指引";
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'card-wrapper opacity-0';
+                wrapper.style.animation = `fadeIn 0.5s ease-out forwards ${index * 0.2}s`;
+
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.onclick = function() { revealCard(cardEl, index); };
+                
+                const reversedClass = card.isReversed ? 'rotate-180' : '';
+                const reversedText = card.isReversed ? '<span class="text-red-800 font-bold block text-xs mt-1 uppercase tracking-wide">Reversed (逆位)</span>' : '<span class="text-gray-400 block text-xs mt-1 opacity-0">.</span>';
+
+                let symbol = "✦";
+                if(card.suit === 'Cups') symbol = "🏆";
+                if(card.suit === 'Wands') symbol = "🥖"; 
+                if(card.suit === 'Swords') symbol = "⚔️";
+                if(card.suit === 'Pentacles') symbol = "🪙";
+
+                cardEl.innerHTML = `
+                    <div class="card-face card-back group">
+                        <div class="w-full h-full border-2 border-purple-900/30 rounded-lg flex items-center justify-center">
+                            <div class="text-4xl text-yellow-600/50 group-hover:scale-110 transition duration-500">⚜️</div>
+                        </div>
+                    </div>
+                    <div class="card-face card-front">
+                        <div class="border-2 border-yellow-700/20 w-full h-full flex flex-col items-center justify-center p-2 rounded relative bg-gradient-to-br from-white to-orange-50/50">
+                            
+                            <div class="card-inner-content ${reversedClass} flex flex-col items-center justify-center w-full h-full">
+                                <div class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 font-serif">${card.displaySuit}</div>
+                                
+                                <div class="text-4xl mb-3 text-gray-800">${symbol}</div>
+                                
+                                <h4 class="text-lg font-bold text-gray-900 leading-tight arcana-font">${card.nameEn}</h4>
+                                <div class="h-px w-8 bg-yellow-600 my-2"></div>
+                                <h4 class="text-md font-medium text-gray-800 cn-font">${card.nameCn}</h4>
+                                
+                                ${reversedText}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-10 w-full text-center">
+                        <div class="text-xs text-yellow-500 font-bold tracking-widest uppercase arcana-font">${positionLabel}</div>
+                        <div class="text-xs text-gray-500 cn-font">${positionDesc}</div>
+                    </div>
+                `;
+                
+                wrapper.appendChild(cardEl);
+                container.appendChild(wrapper);
+            });
+        }
+
+        function revealCard(element, index) {
+            if (element.classList.contains('flipped')) return;
+            
+            element.classList.add('flipped');
+            revealedCount++;
+
+            if (revealedCount === drawnCards.length) {
+                setTimeout(showResults, 800);
+            }
+        }
+
+        function showResults() {
+            const panel = document.getElementById('result-panel');
+            const output = document.getElementById('output-text');
+            const intent = document.getElementById('user-intent').value || "General Reading";
+            const quickMeaningContainer = document.getElementById('quick-meaning-container');
+            const quickMeaningText = document.getElementById('quick-meaning-text');
+            
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // --- Generate Result Text ---
+            let text = "Master, I have consulted the Digital Ether. Here is the spread:\n\n";
+            text += `Seeker's Intent (问题): ${intent}\n`;
+            text += `Spread Type: ${currentSpread.toUpperCase()}\n`;
+            text += "----------------------------\n";
+            
+            // Clear previous meanings
+            quickMeaningContainer.classList.add('hidden');
+
+            // Store insights for LLM text
+            let autoInsights = [];
+
+            drawnCards.forEach((card, index) => {
+                let position = `Card ${index + 1}`;
+                if(currentSpread === 'three') {
+                    const posNames = ["1. Past (过去)", "2. Present (现在)", "3. Future (未来)"];
+                    position = posNames[index];
+                }
+                if(currentSpread === 'celtic') {
+                     const posNames = ["1. Core (核心)", "2. Obstacle (阻碍)", "3. Advice (建议)", "4. Hopes/Fears (希冀)", "5. Outcome (结果)"];
+                     position = posNames[index];
+                }
+
+                const orientation = card.isReversed ? "REVERSED (逆位)" : "Upright (正位)";
+                text += `${position}: 【${card.nameEn} - ${card.nameCn}】\n   Orientation: ${orientation}\n`;
+
+                // Calculate insight for text output
+                const insight = getCardInsight(card);
+                autoInsights.push(`${position}: [${insight.polarityText}] ${insight.text}`);
+            });
+
+            // --- Quick Meaning Logic for Single Card ---
+            if (currentSpread === 'single' && drawnCards.length === 1) {
+                const insight = getCardInsight(drawnCards[0]);
+                quickMeaningText.innerHTML = `<span class="${insight.badgeClass}">${insight.label}</span> <strong class="text-purple-300 ml-2">${drawnCards[0].nameCn}:</strong> ${insight.text}`;
+                quickMeaningContainer.classList.remove('hidden');
+                
+                // Add to clipboard text
+                text += `\n[Auto-Insight]: ${insight.label} (${insight.polarityText}) - ${insight.text}\n`;
+            }
+            
+            text += "----------------------------\n";
+            text += "\nPlease provide the 4-Layer Analysis (Visual, Core, Esoteric, Practical).\n请进行四层解读（视觉、核心、神秘学、实践建议）。";
+
+            output.innerText = text;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('output-text').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.innerText = "✨ Result Copied. Paste to the Master now. (已复制，请发送给导师)";
+                feedback.style.opacity = '1';
+                setTimeout(() => feedback.style.opacity = '0', 3000);
+            });
+        }
+
+        function resetApp() {
+            location.reload();
+        }
+
+        // Initialize
+        buildDeck();
+    </script>
+</body>
+</html>
