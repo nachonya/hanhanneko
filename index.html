@@ -359,6 +359,7 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
         // 如果是外部链接，新标签页打开
         if (link.url.startsWith('http')) {
             a.target = '_blank';
+			a.rel = 'noopener noreferrer';
         }
 
         // 判断是使用Emoji还是自动抓取网站图标
