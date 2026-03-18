@@ -1,5 +1,5 @@
 {
-  "link":[
+  "links":[
         { name: "乾坤速断", url: "1.html", desc: "六爻八字排盘", emoji: "☯️" },
         { name: "赛博塔罗", url: "2.html", desc: "今日运势占卜", emoji: "🔮" },
         { name: "GitHub", url: "https://github.com", desc: "代码仓库" },
