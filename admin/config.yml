@@ -1,0 +1,22 @@
+backend:
+  name: github
+  repo: nachonya/hanhanneko
+  branch: main
+media_folder: "images"
+public_folder: "/images"
+collections:
+  - name: "toolbox"
+    label: "🧰 工具箱管理"
+    files:
+      - file: "links.json"
+        name: "links_data"
+        label: "修改导航链接"
+        fields:
+          - label: "网站列表"
+            name: "links"
+            widget: "list"
+            fields:
+              - {label: "名称", name: "name", widget: "string"}
+              - {label: "网址", name: "url", widget: "string"}
+              - {label: "描述", name: "desc", widget: "string", required: false}
+              - {label: "Emoji", name: "emoji", widget: "string", required: false}
