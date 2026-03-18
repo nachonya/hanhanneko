@@ -8,5 +8,5 @@
         { name: "Vercel", url: "https://vercel.com", desc: "网站托管" },
         { name: "STEAM", url: "https://store.steampowered.com", desc: "STEAM官网入口" },
 		    { name: "豆包", url: "https://www.doubao.com/chat", desc: "社会你豆姐" }
-    ];
+    ]
 }
