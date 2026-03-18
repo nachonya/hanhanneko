@@ -259,11 +259,13 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
 </footer>
 
 <script>
+// 1. 滚动复位
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
 
+    // 2. 监听滚动动画 (核心！没了它卡片就不出来)
     document.addEventListener("DOMContentLoaded", function() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -278,6 +280,7 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
         });
     });
 
+    // 3. 塔罗牌抽卡 DLC 逻辑
     const fortunes = [
         { level: "大吉", text: "今日宜重温《魔女之旅》，享受一段没有终点的旅程。" },
         { level: "中吉", text: "泡一杯热茶，翻开那本吃灰的阿加莎小说吧，迷局在等你。" },
@@ -306,6 +309,7 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
         }
     }
 
+    // 4. 像素猫跟随鼠标逻辑
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let catX = mouseX;
@@ -319,6 +323,7 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
     });
 
     function animateCat() {
+        if(!cat) return; // 安全判定
         let distX = mouseX - catX;
         let distY = mouseY - catY;
         
@@ -337,44 +342,41 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
         requestAnimationFrame(animateCat);
     }
     animateCat();
-// ================= 导航工具箱逻辑 =================
-  // ================= 导航工具箱逻辑 (从 JSON 读取) =================
-// ================= 导航工具箱逻辑 (从 JSON 读取) =================
+
+    // 5. 赛博工具箱：从 JSON 读取数据
     const navGrid = document.getElementById('navGrid');
+    if(navGrid) {
+        fetch('links.json')
+            .then(response => response.json())
+            .then(data => {
+                data.links.forEach(link => {
+                    const a = document.createElement('a');
+                    a.href = link.url;
+                    a.className = 'nav-item';
+                    if (link.url.startsWith('http')) {
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                    }
 
-    fetch('links.json')
-        .then(response => response.json())
-        .then(data => {
-            // 注意这里是 data.links，对应 json 里的 "links"
-            data.links.forEach(link => {
-                const a = document.createElement('a');
-                a.href = link.url;
-                a.className = 'nav-item';
-                // 如果是外部链接，新标签页打开
-                if (link.url.startsWith('http')) {
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                }
+                    let iconHtml = '';
+                    if (link.emoji && link.emoji.trim() !== "") {
+                        iconHtml = `<div class="emoji-icon">${link.emoji}</div>`;
+                    } else {
+                        const domain = new URL(link.url).hostname;
+                        const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+                        iconHtml = `<img src="${iconUrl}" alt="${link.name} icon" loading="lazy">`;
+                    }
 
-                // 判断是使用Emoji还是自动抓取网站图标
-                let iconHtml = '';
-                if (link.emoji && link.emoji.trim() !== "") {
-                    iconHtml = `<div class="emoji-icon">${link.emoji}</div>`;
-                } else {
-                    const domain = new URL(link.url).hostname;
-                    const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-                    iconHtml = `<img src="${iconUrl}" alt="${link.name} icon" loading="lazy">`;
-                }
-
-                a.innerHTML = `
-                    ${iconHtml}
-                    <span>${link.name}</span>
-                    <div class="nav-desc">${link.desc}</div>
-                `;
-                navGrid.appendChild(a);
-            });
-        })
-        .catch(error => console.error('加载工具箱失败:', error));
+                    a.innerHTML = `
+                        ${iconHtml}
+                        <span>${link.name}</span>
+                        <div class="nav-desc">${link.desc}</div>
+                    `;
+                    navGrid.appendChild(a);
+                });
+            })
+            .catch(error => console.error('加载工具箱失败:', error));
+    }
 </script>
 </body>
 </html>
