@@ -1,12 +1,12 @@
 {
-  "links":[
-        { name: "乾坤速断", url: "1.html", desc: "六爻八字排盘", emoji: "☯️" },
-        { name: "赛博塔罗", url: "2.html", desc: "今日运势占卜", emoji: "🔮" },
-        { name: "GitHub", url: "https://github.com", desc: "代码仓库" },
-        { name: "Bilibili", url: "https://www.bilibili.com", desc: "二次元大本营" },
-        { name: "Namecheap", url: "https://www.namecheap.com", desc: "域名管理" },
-        { name: "Vercel", url: "https://vercel.com", desc: "网站托管" },
-        { name: "STEAM", url: "https://store.steampowered.com", desc: "STEAM官网入口" },
-		    { name: "豆包", url: "https://www.doubao.com/chat", desc: "社会你豆姐" }
+  "links": [
+        { "name": "乾坤速断", "url": "1.html", "desc": "六爻八字排盘", "emoji": "☯️" },
+        { "name": "赛博塔罗", "url": "2.html", "desc": "今日运势占卜", "emoji": "🔮" },
+        { "name": "GitHub", "url": "https://github.com", "desc": "代码仓库" },
+        { "name": "Bilibili", "url": "https://www.bilibili.com", "desc": "二次元大本营" },
+        { "name": "Namecheap", "url": "https://www.namecheap.com", "desc": "域名管理" },
+        { "name": "Vercel", "url": "https://vercel.com", "desc": "网站托管" },
+        { "name": "STEAM", "url": "https://store.steampowered.com", "desc": "STEAM官网入口" },
+        { "name": "豆包", "url": "https://www.doubao.com/chat", "desc": "社会你豆姐" }
     ]
 }
