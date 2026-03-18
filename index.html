@@ -338,17 +338,36 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
     }
     animateCat();
 // ================= 导航工具箱逻辑 =================
-    // 在这里配置你的网站！想加什么直接往数组里写
-    const navLinks = [
-        { name: "乾坤速断", url: "1.html", desc: "六爻八字排盘", emoji: "☯️" },
-        { name: "赛博塔罗", url: "2.html", desc: "今日运势占卜", emoji: "🔮" },
-        { name: "GitHub", url: "https://github.com", desc: "代码仓库" },
-        { name: "Bilibili", url: "https://www.bilibili.com", desc: "二次元大本营" },
-        { name: "Namecheap", url: "https://www.namecheap.com", desc: "域名管理" },
-        { name: "Vercel", url: "https://vercel.com", desc: "网站托管" },
-        { name: "STEAM", url: "https://store.steampowered.com", desc: "STEAM官网入口" },
-		{ name: "豆包", url: "https://www.doubao.com/chat", desc: "社会你豆姐" }
-    ];
+  // ================= 导航工具箱逻辑 (从 JSON 读取) =================
+    const navGrid = document.getElementById('navGrid');
+
+    fetch('links.json')
+        .then(response => response.json())
+        .then(data => {
+            data.links.forEach(link => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.className = 'nav-item';
+                if (link.url.startsWith('http')) a.target = '_blank';
+
+                let iconHtml = '';
+                if (link.emoji && link.emoji.trim() !== "") {
+                    iconHtml = `<div class="emoji-icon">${link.emoji}</div>`;
+                } else {
+                    const domain = new URL(link.url).hostname;
+                    const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+                    iconHtml = `<img src="${iconUrl}" alt="${link.name} icon" loading="lazy">`;
+                }
+
+                a.innerHTML = `
+                    ${iconHtml}
+                    <span>${link.name}</span>
+                    <div class="nav-desc">${link.desc}</div>
+                `;
+                navGrid.appendChild(a);
+            });
+        })
+        .catch(error => console.error('加载工具箱失败:', error));
 
     const navGrid = document.getElementById('navGrid');
 
