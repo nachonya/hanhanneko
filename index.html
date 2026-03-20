@@ -177,7 +177,10 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
 <body>
 
 <div class="screen-wipe"></div>
-
+<audio id="bgmPlayer" loop preload="none"></audio>
+    <div id="musicBtn" class="music-toggle" style="display: none;" onclick="toggleMusic()">
+        🎵 <span id="musicText">播放 BGM</span>
+    </div>
 <div class="pixel-cat" id="pixelCat">
     <img src="cat.gif" alt="">
 </div>
@@ -311,33 +314,81 @@ footer { text-align: center; padding: 3rem 0; color: #aaa; margin-top: 4rem; }
   // ================= 导航工具箱逻辑 (从 JSON 读取) =================
     const navGrid = document.getElementById('navGrid');
 
-    fetch('links.json')
+    // ================= 1. 加载全局设置 (背景与音乐) =================
+    fetch('settings.json')
         .then(response => response.json())
         .then(data => {
-            data.links.forEach(link => {
-                const a = document.createElement('a');
-                a.href = link.url;
-                a.className = 'nav-item';
-                if (link.url.startsWith('http')) a.target = '_blank';
-
-                let iconHtml = '';
-                if (link.emoji && link.emoji.trim() !== "") {
-                    iconHtml = `<div class="emoji-icon">${link.emoji}</div>`;
-                } else {
-                    const domain = new URL(link.url).hostname;
-                    const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-                    iconHtml = `<img src="${iconUrl}" alt="${link.name} icon" loading="lazy">`;
-                }
-
-                a.innerHTML = `
-                    ${iconHtml}
-                    <span>${link.name}</span>
-                    <div class="nav-desc">${link.desc}</div>
-                `;
-                navGrid.appendChild(a);
-            });
+            // 如果后台上传了背景图，就替换网页背景
+            if (data.bg_image) {
+                document.body.style.backgroundImage = `url('${data.bg_image}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundAttachment = 'fixed';
+                document.body.style.backgroundPosition = 'center';
+            }
+            // 如果后台上传了音乐，就激活右下角的播放按钮
+            if (data.bgm_audio) {
+                const player = document.getElementById('bgmPlayer');
+                const btn = document.getElementById('musicBtn');
+                player.src = data.bgm_audio;
+                btn.style.display = 'flex'; // 显示悬浮按钮
+            }
         })
-        .catch(error => console.error('加载工具箱失败:', error));
+        .catch(error => console.error('加载全局设置失败:', error));
+
+    // 音乐播放控制开关
+    function toggleMusic() {
+        const player = document.getElementById('bgmPlayer');
+        const btn = document.getElementById('musicBtn');
+        const text = document.getElementById('musicText');
+        
+        if (player.paused) {
+            player.play();
+            btn.classList.add('playing');
+            text.innerText = '暂停 BGM';
+        } else {
+            player.pause();
+            btn.classList.remove('playing');
+            text.innerText = '播放 BGM';
+        }
+    }
+
+    // ================= 2. 加载工具箱 (支持自定义上传图标) =================
+    const navGrid = document.getElementById('navGrid');
+    if(navGrid) {
+        fetch('links.json')
+            .then(response => response.json())
+            .then(data => {
+                data.links.forEach(link => {
+                    const a = document.createElement('a');
+                    a.href = link.url;
+                    a.className = 'nav-item';
+                    if (link.url.startsWith('http')) {
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                    }
+
+                    // 图标优先级：1.自定义上传图标 -> 2.Emoji -> 3.自动抓取网站图标
+                    let iconHtml = '';
+                    if (link.custom_icon) {
+                        iconHtml = `<img src="${link.custom_icon}" alt="${link.name} icon" style="width:48px;height:48px;border-radius:12px;margin-bottom:12px;object-fit:cover;" loading="lazy">`;
+                    } else if (link.emoji && link.emoji.trim() !== "") {
+                        iconHtml = `<div class="emoji-icon">${link.emoji}</div>`;
+                    } else {
+                        const domain = new URL(link.url).hostname;
+                        const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+                        iconHtml = `<img src="${iconUrl}" alt="${link.name} icon" loading="lazy">`;
+                    }
+
+                    a.innerHTML = `
+                        ${iconHtml}
+                        <span>${link.name}</span>
+                        <div class="nav-desc">${link.desc || ''}</div>
+                    `;
+                    navGrid.appendChild(a);
+                });
+            })
+            .catch(error => console.error('加载工具箱失败:', error));
+    }
 </script>
 </body>
 </html>
