@@ -54,6 +54,13 @@
       "url": "https://www.doubao.com/chat",
       "desc": "社会你豆姐",
       "emoji": ""
+    },
+    {
+      "name": "在线编译器",
+      "url": "https://www.onlinegdb.com/#",
+      "desc": "",
+      "emoji": "",
+      "custom_icon": ""
     }
   ]
 }
