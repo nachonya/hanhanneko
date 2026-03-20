@@ -75,6 +75,20 @@
       "desc": "",
       "emoji": "",
       "custom_icon": ""
+    },
+    {
+      "name": "世界监测",
+      "url": "https://worldmonitor.app/",
+      "desc": "帮助了解世界情报的GitHub开源项目",
+      "emoji": "",
+      "custom_icon": ""
+    },
+    {
+      "name": "小黑猫",
+      "url": "https://github.com/clashbk/clash",
+      "desc": "一个网络小工具，具体要自己研究才行",
+      "emoji": "",
+      "custom_icon": ""
     }
   ]
 }
