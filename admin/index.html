@@ -1,11 +1,1111 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>赛博工具箱 - 管理后台</title>
-  </head>
-  <body>
-    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
-  </body>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟雨楼阁 · 管理后台</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --bg: #f0f2f5;
+  --panel: #ffffff;
+  --border: #e4e8ef;
+  --text: #1a1a2e;
+  --muted: #8890a4;
+  --accent: #ff9800;
+  --accent2: #e57373;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --drag-bg: #fffbe6;
+  --drag-border: #ff9800;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-logo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar-logo .badge {
+  font-size: 0.65rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-primary {
+  background: var(--text);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent); }
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover { opacity: 0.85; }
+.btn-danger {
+  background: transparent;
+  color: var(--accent2);
+  border: 1px solid #ffd6d6;
+}
+.btn-danger:hover { background: #fff0f0; }
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+}
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  padding: 24px 28px;
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ===== PANEL ===== */
+.panel {
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-title .count {
+  font-size: 0.75rem;
+  background: var(--bg);
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 400;
+}
+
+/* ===== LINK LIST ===== */
+.link-list {
+  padding: 12px;
+  min-height: 200px;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: default;
+  user-select: none;
+  background: var(--bg);
+}
+.link-row:last-child { margin-bottom: 0; }
+.link-row:hover { border-color: var(--border); background: #f8f9fb; }
+.link-row.selected {
+  border-color: var(--accent);
+  background: #fff8f0;
+}
+.link-row.dragging {
+  opacity: 0.4;
+  border-style: dashed;
+  border-color: var(--accent);
+}
+.link-row.drag-over {
+  background: var(--drag-bg);
+  border-color: var(--drag-border);
+  border-style: dashed;
+}
+
+.drag-handle {
+  color: #ccc;
+  cursor: grab;
+  font-size: 1.1rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+.drag-handle:hover { color: var(--accent); background: #fff3e0; }
+.drag-handle:active { cursor: grabbing; }
+
+.link-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+.link-icon-wrap:hover { border-color: var(--accent); }
+.link-icon-wrap:hover::after {
+  content: '✏️';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,152,0,0.15);
+  font-size: 18px;
+}
+.link-icon-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.link-info {
+  flex: 1;
+  min-width: 0;
+}
+.link-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.link-url {
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.link-desc-chip {
+  font-size: 0.7rem;
+  background: #f0f4ff;
+  color: #7b8abf;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.link-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ===== EDITOR PANEL ===== */
+.editor-panel {
+  position: sticky;
+  top: 84px;
+}
+
+.editor-empty {
+  padding: 48px 22px;
+  text-align: center;
+  color: var(--muted);
+}
+.editor-empty .big-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
+.editor-empty p { font-size: 0.85rem; line-height: 1.6; }
+
+.editor-body {
+  padding: 20px;
+}
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.field input[type="text"],
+.field input[type="url"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--accent); background: #fff; }
+
+/* Icon chooser */
+.icon-chooser {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.icon-preview-big {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.icon-preview-big:hover { border-color: var(--accent); }
+.icon-preview-big img { width: 100%; height: 100%; object-fit: contain; }
+.icon-chooser-controls { flex: 1; }
+
+.icon-type-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.icon-tab {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.icon-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.icon-section { display: none; }
+.icon-section.active { display: block; }
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.upload-zone:hover { border-color: var(--accent); background: #fff8f0; color: var(--accent); }
+.upload-zone input { display: none; }
+
+/* Favicon auto */
+.favicon-info {
+  font-size: 0.78rem;
+  color: var(--muted);
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+/* Editor footer */
+.editor-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+/* ===== PREVIEW ===== */
+.preview-section {
+  margin-top: 24px;
+}
+.preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+}
+.prev-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 16px 12px;
+  border-radius: 14px;
+  width: 100px;
+  text-decoration: none;
+  color: var(--text);
+  cursor: default;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+.prev-item.selected { border-color: var(--accent); background: #fff8f0; }
+.prev-icon { font-size: 32px; margin-bottom: 8px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.prev-icon img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.prev-name { font-size: 0.75rem; font-weight: 600; text-align: center; }
+.prev-desc { font-size: 0.65rem; color: var(--muted); text-align: center; margin-top: 2px; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--text);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  transform: scale(0.92) translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.show .modal { transform: scale(1) translateY(0); }
+.modal h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.modal p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===== JSON EXPORT ===== */
+.json-area {
+  background: #1a1a2e;
+  color: #a8d8a8;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  max-height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ===== TIP ===== */
+.tip {
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: #f8f9ff;
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 8px 8px 0;
+  margin: 12px 20px;
+  line-height: 1.6;
+}
+
+/* Drag placeholder */
+.drag-placeholder {
+  height: 60px;
+  border-radius: 12px;
+  border: 2px dashed #ffc97a;
+  background: #fff8f0;
+  margin-bottom: 6px;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .editor-panel { position: static; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    🏮 烟雨楼阁
+    <span class="badge">管理后台</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost btn-sm" onclick="window.open('index.html','_blank')">🌐 预览网站</button>
+    <button class="btn btn-accent btn-sm" onclick="showExportModal()">💾 导出 JSON</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: Link list -->
+  <div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          🧰 导航图标管理
+          <span class="count" id="countBadge">0 个</span>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addNewLink()">＋ 添加图标</button>
+      </div>
+      <div class="tip">💡 拖拽左侧 <strong>⠿</strong> 手柄可调整图标顺序；点击行可在右侧编辑；点击图标可上传自定义图片</div>
+      <div class="link-list" id="linkList"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="panel preview-section" style="margin-top:24px;">
+      <div class="panel-header">
+        <div class="panel-title">👁️ 实时预览效果</div>
+      </div>
+      <div class="preview-grid" id="previewGrid"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Editor -->
+  <div class="editor-panel">
+    <div class="panel" id="editorPanel">
+      <div class="panel-header">
+        <div class="panel-title">✏️ 编辑图标</div>
+      </div>
+      <div id="editorContent">
+        <div class="editor-empty">
+          <div class="big-icon">🖱️</div>
+          <p>点击左侧任意一个图标<br>即可在此编辑详情</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>确认删除？</h3>
+    <p>删除后无法恢复，只有在导出 JSON 前可通过刷新页面找回原始数据。</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('deleteModal')">取消</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">🗑️ 确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal" style="width:480px;">
+    <h3>📦 导出 links.json</h3>
+    <p>将以下内容复制并覆盖你的 <code>links.json</code> 文件，即可更新网站导航。</p>
+    <div class="json-area" id="jsonOutput"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeModal('exportModal')">关闭</button>
+      <button class="btn btn-primary" onclick="copyJson()">📋 复制 JSON</button>
+      <button class="btn btn-accent" onclick="downloadJson()">⬇️ 下载文件</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input for icon uploads -->
+<input type="file" id="globalFileInput" accept="image/*" style="display:none;">
+
+<script>
+// ==================== DATA ====================
+const DEFAULT_LINKS = [
+  { name: "乾坤速断", url: "1.html", desc: "六爻八字排盘", emoji: "☯️" },
+  { name: "赛博塔罗", url: "2.html", desc: "今日运势占卜", emoji: "🔮" },
+  { name: "GitHub", url: "https://github.com", desc: "代码仓库", emoji: "" },
+  { name: "Bilibili", url: "https://www.bilibili.com", desc: "二次元大本营", emoji: "" },
+  { name: "关于我", url: "about.html", desc: "个人碎碎念与喜好", emoji: "🙋‍♂️" },
+  { name: "Namecheap", url: "https://www.namecheap.com", desc: "域名管理", emoji: "" },
+  { name: "Vercel", url: "https://vercel.com", desc: "网站托管", emoji: "" },
+  { name: "STEAM", url: "https://store.steampowered.com", desc: "STEAM官网入口", emoji: "" },
+  { name: "豆包", url: "https://www.doubao.com/chat", desc: "社会你豆姐", emoji: "" }
+];
+
+let links = JSON.parse(JSON.stringify(DEFAULT_LINKS));
+let selectedIdx = null;
+let deleteTargetIdx = null;
+let iconEditingIdx = null; // which link are we editing icon for
+let currentIconType = {}; // per-index: 'emoji' | 'upload' | 'favicon'
+let dragSrcIdx = null;
+let placeholder = null;
+
+// ==================== INIT ====================
+function init() {
+  // Try loading from localStorage
+  const saved = localStorage.getItem('yanyulou_links');
+  if (saved) {
+    try { links = JSON.parse(saved); } catch(e) {}
+  }
+  render();
+}
+
+function save() {
+  localStorage.setItem('yanyulou_links', JSON.stringify(links));
+  updateCountBadge();
+  renderPreview();
+}
+
+// ==================== RENDER ====================
+function render() {
+  renderList();
+  renderPreview();
+  updateCountBadge();
+}
+
+function updateCountBadge() {
+  document.getElementById('countBadge').textContent = `${links.length} 个`;
+}
+
+function getFaviconUrl(url) {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  } catch(e) {
+    return '';
+  }
+}
+
+function getIconHtml(link, size = 'small') {
+  const big = size === 'big';
+  const px = big ? '34px' : '22px';
+  if (link.customImage) {
+    return `<img src="${link.customImage}" alt="" style="width:${big?'100%':'36px'};height:${big?'100%':'36px'};object-fit:contain;border-radius:8px;">`;
+  }
+  if (link.emoji && link.emoji.trim()) {
+    return `<span style="font-size:${px};line-height:1;">${link.emoji}</span>`;
+  }
+  const fav = getFaviconUrl(link.url);
+  if (fav) return `<img src="${fav}" alt="" style="width:${big?'100%':'32px'};height:${big?'100%':'32px'};object-fit:contain;">`;
+  return `<span style="font-size:${px};">🔗</span>`;
+}
+
+function renderList() {
+  const list = document.getElementById('linkList');
+  list.innerHTML = '';
+  links.forEach((link, idx) => {
+    const row = document.createElement('div');
+    row.className = 'link-row' + (idx === selectedIdx ? ' selected' : '');
+    row.dataset.idx = idx;
+
+    row.innerHTML = `
+      <div class="drag-handle" draggable="true" data-idx="${idx}" title="拖拽排序">⠿</div>
+      <div class="link-icon-wrap" onclick="openIconEditor(${idx})" title="点击更换图标">
+        ${getIconHtml(link)}
+      </div>
+      <div class="link-info" onclick="selectLink(${idx})" style="cursor:pointer;">
+        <div class="link-name">${link.name || '（未命名）'}</div>
+        <div class="link-url">${link.url || ''}</div>
+        ${link.desc ? `<div class="link-desc-chip">${link.desc}</div>` : ''}
+      </div>
+      <div class="link-actions">
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="moveLink(${idx},-1)" title="上移" ${idx===0?'disabled':''}>↑</button>
+        <button class="btn btn-ghost btn-icon btn-sm" onclick="moveLink(${idx},1)" title="下移" ${idx===links.length-1?'disabled':''}>↓</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="askDelete(${idx})" title="删除">🗑</button>
+      </div>
+    `;
+
+    // Drag events on handle
+    const handle = row.querySelector('.drag-handle');
+    handle.addEventListener('mousedown', () => { row.draggable = true; });
+    handle.addEventListener('mouseup', () => { row.draggable = false; });
+
+    row.addEventListener('dragstart', onDragStart);
+    row.addEventListener('dragover', onDragOver);
+    row.addEventListener('drop', onDrop);
+    row.addEventListener('dragend', onDragEnd);
+    row.addEventListener('dragenter', onDragEnter);
+    row.addEventListener('dragleave', onDragLeave);
+
+    list.appendChild(row);
+  });
+}
+
+function renderPreview() {
+  const grid = document.getElementById('previewGrid');
+  grid.innerHTML = '';
+  links.forEach((link, idx) => {
+    const div = document.createElement('div');
+    div.className = 'prev-item' + (idx === selectedIdx ? ' selected' : '');
+    div.onclick = () => selectLink(idx);
+    div.style.cursor = 'pointer';
+    div.innerHTML = `
+      <div class="prev-icon">${getIconHtml(link, 'big')}</div>
+      <div class="prev-name">${link.name || '未命名'}</div>
+      ${link.desc ? `<div class="prev-desc">${link.desc}</div>` : ''}
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ==================== SELECT / EDIT ====================
+function selectLink(idx) {
+  selectedIdx = idx;
+  renderList();
+  renderPreview();
+  renderEditor();
+}
+
+function renderEditor() {
+  if (selectedIdx === null || !links[selectedIdx]) {
+    document.getElementById('editorContent').innerHTML = `
+      <div class="editor-empty">
+        <div class="big-icon">🖱️</div>
+        <p>点击左侧任意一个图标<br>即可在此编辑详情</p>
+      </div>`;
+    return;
+  }
+  const link = links[selectedIdx];
+  const iconType = currentIconType[selectedIdx] || (link.customImage ? 'upload' : (link.emoji?.trim() ? 'emoji' : 'favicon'));
+
+  document.getElementById('editorContent').innerHTML = `
+    <div class="editor-body">
+      <div class="field">
+        <label>图标</label>
+        <div class="icon-chooser">
+          <div class="icon-preview-big" onclick="openIconEditor(${selectedIdx})">
+            ${getIconHtml(link, 'big')}
+          </div>
+          <div class="icon-chooser-controls">
+            <div class="icon-type-tabs">
+              <button class="icon-tab ${iconType==='emoji'?'active':''}" onclick="switchIconType(${selectedIdx},'emoji')">Emoji</button>
+              <button class="icon-tab ${iconType==='upload'?'active':''}" onclick="switchIconType(${selectedIdx},'upload')">上传图片</button>
+              <button class="icon-tab ${iconType==='favicon'?'active':''}" onclick="switchIconType(${selectedIdx},'favicon')">自动获取</button>
+            </div>
+
+            <div id="iconSection-emoji" class="icon-section ${iconType==='emoji'?'active':''}">
+              <input type="text" id="field-emoji" value="${link.emoji||''}" placeholder="粘贴 Emoji，如 🎮"
+                style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:1.2rem;font-family:inherit;outline:none;"
+                oninput="liveUpdate('emoji', this.value)">
+            </div>
+            <div id="iconSection-upload" class="icon-section ${iconType==='upload'?'active':''}">
+              <div class="upload-zone" onclick="triggerImageUpload(${selectedIdx})">
+                <input type="file" accept="image/*" onchange="handleImageUpload(${selectedIdx}, this)">
+                ${link.customImage
+                  ? `<span>🖼️ 已上传图片（点击重新上传）</span>`
+                  : `<span>📁 点击选择图片文件<br><small>支持 PNG / JPG / GIF / WebP / SVG</small></span>`
+                }
+              </div>
+            </div>
+            <div id="iconSection-favicon" class="icon-section ${iconType==='favicon'?'active':''}">
+              <div class="favicon-info">
+                🌐 自动从网址中提取网站图标。<br>
+                请确保网址已填写完整。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>名称</label>
+        <input type="text" id="field-name" value="${link.name||''}" placeholder="图标名称" oninput="liveUpdate('name', this.value)">
+      </div>
+      <div class="field">
+        <label>链接网址</label>
+        <input type="url" id="field-url" value="${link.url||''}" placeholder="https://example.com 或 page.html" oninput="liveUpdate('url', this.value)">
+      </div>
+      <div class="field">
+        <label>描述文字</label>
+        <input type="text" id="field-desc" value="${link.desc||''}" placeholder="简短描述（可选）" oninput="liveUpdate('desc', this.value)">
+      </div>
+    </div>
+    <div class="editor-footer">
+      <button class="btn btn-primary" style="flex:1;" onclick="applyEdit()">✅ 应用更改</button>
+      <button class="btn btn-danger" onclick="askDelete(${selectedIdx})">🗑 删除</button>
+    </div>
+  `;
+}
+
+function switchIconType(idx, type) {
+  currentIconType[idx] = type;
+  // If switching to favicon, clear custom image and emoji
+  if (type === 'favicon') {
+    links[idx].customImage = null;
+    links[idx].emoji = '';
+  }
+  if (type === 'emoji') {
+    links[idx].customImage = null;
+  }
+  if (type === 'upload') {
+    links[idx].emoji = '';
+  }
+  renderEditor();
+  renderList();
+  renderPreview();
+  save();
+}
+
+function liveUpdate(field, value) {
+  if (selectedIdx === null) return;
+  links[selectedIdx][field] = value;
+  renderList();
+  renderPreview();
+  // Don't re-render editor to avoid losing focus
+}
+
+function applyEdit() {
+  if (selectedIdx === null) return;
+  const name = document.getElementById('field-name').value;
+  const url = document.getElementById('field-url').value;
+  const desc = document.getElementById('field-desc').value;
+  const emoji = document.getElementById('field-emoji')?.value || links[selectedIdx].emoji || '';
+  links[selectedIdx].name = name;
+  links[selectedIdx].url = url;
+  links[selectedIdx].desc = desc;
+  links[selectedIdx].emoji = emoji;
+  save();
+  renderList();
+  renderPreview();
+  toast('✅', '更改已保存！');
+}
+
+// ==================== ICON UPLOAD ====================
+function openIconEditor(idx) {
+  selectedIdx = idx;
+  renderList();
+  renderPreview();
+  renderEditor();
+  // Switch to upload tab and trigger file picker
+  setTimeout(() => {
+    switchIconType(idx, 'upload');
+    triggerImageUpload(idx);
+  }, 50);
+}
+
+function triggerImageUpload(idx) {
+  iconEditingIdx = idx;
+  const input = document.getElementById('globalFileInput');
+  input.value = '';
+  input.onchange = (e) => {
+    if (e.target.files[0]) handleImageFile(idx, e.target.files[0]);
+  };
+  input.click();
+}
+
+function handleImageUpload(idx, inputEl) {
+  if (inputEl.files[0]) handleImageFile(idx, inputEl.files[0]);
+}
+
+function handleImageFile(idx, file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    links[idx].customImage = e.target.result;
+    links[idx].emoji = '';
+    currentIconType[idx] = 'upload';
+    save();
+    if (selectedIdx === idx) renderEditor();
+    renderList();
+    renderPreview();
+    toast('🖼️', '图片上传成功！');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==================== ADD / DELETE ====================
+function addNewLink() {
+  links.push({ name: '新图标', url: 'https://', desc: '', emoji: '🔗' });
+  save();
+  selectedIdx = links.length - 1;
+  renderList();
+  renderPreview();
+  renderEditor();
+  document.getElementById('linkList').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+  toast('✨', '已添加新图标，请在右侧编辑！');
+}
+
+function askDelete(idx) {
+  deleteTargetIdx = idx;
+  showModal('deleteModal');
+}
+
+function confirmDelete() {
+  if (deleteTargetIdx === null) return;
+  links.splice(deleteTargetIdx, 1);
+  if (selectedIdx === deleteTargetIdx) {
+    selectedIdx = null;
+  } else if (selectedIdx > deleteTargetIdx) {
+    selectedIdx--;
+  }
+  deleteTargetIdx = null;
+  closeModal('deleteModal');
+  save();
+  render();
+  renderEditor();
+  toast('🗑️', '已删除！');
+}
+
+// ==================== MOVE ====================
+function moveLink(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= links.length) return;
+  [links[idx], links[newIdx]] = [links[newIdx], links[idx]];
+  if (selectedIdx === idx) selectedIdx = newIdx;
+  else if (selectedIdx === newIdx) selectedIdx = idx;
+  save();
+  render();
+  if (selectedIdx !== null) renderEditor();
+}
+
+// ==================== DRAG & DROP ====================
+function onDragStart(e) {
+  dragSrcIdx = parseInt(this.dataset.idx);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragSrcIdx);
+}
+
+function onDragEnd(e) {
+  document.querySelectorAll('.link-row').forEach(r => r.classList.remove('dragging','drag-over'));
+  document.querySelectorAll('.drag-placeholder').forEach(p => p.remove());
+  dragSrcIdx = null;
+}
+
+function onDragEnter(e) {
+  e.preventDefault();
+  if (parseInt(this.dataset.idx) !== dragSrcIdx) {
+    this.classList.add('drag-over');
+  }
+}
+
+function onDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  return false;
+}
+
+function onDrop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  const targetIdx = parseInt(this.dataset.idx);
+  if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+
+  const moved = links.splice(dragSrcIdx, 1)[0];
+  const realTarget = dragSrcIdx < targetIdx ? targetIdx - 1 : targetIdx;
+  links.splice(realTarget, 0, moved);
+
+  if (selectedIdx === dragSrcIdx) selectedIdx = realTarget;
+  else if (selectedIdx !== null) {
+    if (dragSrcIdx < selectedIdx && realTarget >= selectedIdx) selectedIdx--;
+    else if (dragSrcIdx > selectedIdx && realTarget <= selectedIdx) selectedIdx++;
+  }
+
+  save();
+  render();
+  if (selectedIdx !== null) renderEditor();
+  toast('🔀', '顺序已更新！');
+  return false;
+}
+
+// ==================== EXPORT ====================
+function showExportModal() {
+  const exportData = {
+    links: links.map(l => {
+      const item = { name: l.name, url: l.url, desc: l.desc || '' };
+      if (l.customImage) item.customImage = '[BASE64_IMAGE_DATA]';
+      if (l.emoji) item.emoji = l.emoji;
+      return item;
+    })
+  };
+  
+  // Full version with images
+  const fullData = { links: links.map(l => {
+    const item = { name: l.name, url: l.url };
+    if (l.desc) item.desc = l.desc;
+    if (l.customImage) item.customImage = l.customImage;
+    if (l.emoji) item.emoji = l.emoji;
+    return item;
+  })};
+
+  document.getElementById('jsonOutput').textContent = JSON.stringify(fullData, null, 2);
+  showModal('exportModal');
+}
+
+function copyJson() {
+  const text = document.getElementById('jsonOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('📋', 'JSON 已复制到剪贴板！');
+    closeModal('exportModal');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('📋', 'JSON 已复制！');
+    closeModal('exportModal');
+  });
+}
+
+function downloadJson() {
+  const text = document.getElementById('jsonOutput').textContent;
+  const blob = new Blob([text], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'links.json';
+  a.click();
+  toast('⬇️', 'links.json 已下载！');
+}
+
+// ==================== MODAL / TOAST ====================
+function showModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+
+let toastTimer;
+function toast(icon, msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ==================== KEYBOARD ====================
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (selectedIdx !== null) applyEdit();
+    toast('💾', '已保存！');
+  }
+});
+
+// ==================== START ====================
+init();
+</script>
+</body>
 </html>
