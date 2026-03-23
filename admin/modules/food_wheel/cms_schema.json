@@ -1,0 +1,32 @@
+{
+  "collections": [
+    {
+      "name": "food_menu",
+      "label": "🎲 恰饭转盘管理",
+      "files": [
+        {
+          "file": "menu.json",
+          "name": "menu_data",
+          "label": "编辑菜单与菜系",
+          "fields": [
+            {
+              "label": "菜系大类列表",
+              "name": "categories",
+              "widget": "list",
+              "fields": [
+                { "label": "分类ID (如 fastfood)", "name": "categoryId", "widget": "string" },
+                { "label": "分类名称 (如 🍔 快餐速食)", "name": "categoryName", "widget": "string" },
+                {
+                  "label": "具体菜品列表",
+                  "name": "items",
+                  "widget": "list",
+                  "field": { "label": "菜名", "name": "item", "widget": "string" }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
