@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>赛博工具箱 - 管理后台</title>
+    <title>赛博工具箱 - 模块化管理中枢</title>
   </head>
   <body>
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+
+    <script>
+      async function initModularCMS() {
+        const baseConfig = {
+          backend: {
+            name: "github",
+            repo: "nachonya/hanhanneko",
+            branch: "main"
+          },
+          media_folder: "images",
+          public_folder: "/images",
+          collections: []
+        };
+
+        try {
+          const registryRes = await fetch('./modules.json');
+          const registry = await registryRes.json();
+
+          for (const moduleName of registry.active_modules) {
+            try {
+              const modRes = await fetch(`./modules/${moduleName}/cms_schema.json`);
+              const modSchema = await modRes.json();
+              baseConfig.collections.push(...modSchema.collections);
+            } catch (err) {
+              console.warn(`Failed to load module: ${moduleName}`, err);
+            }
+          }
+
+          window.CMS.init({ config: baseConfig });
+
+        } catch (error) {
+          console.error(error);
+          document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>系统启动失败，请检查文件结构</h2>";
+        }
+      }
+
+      initModularCMS();
+    </script>
   </body>
 </html>
