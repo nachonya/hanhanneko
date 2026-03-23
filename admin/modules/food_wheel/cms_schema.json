@@ -17,10 +17,9 @@
                 { "label": "分类ID (如 fastfood)", "name": "categoryId", "widget": "string" },
                 { "label": "分类名称 (如 🍔 快餐速食)", "name": "categoryName", "widget": "string" },
                 {
-                  "label": "具体菜品列表",
+                  "label": "具体菜品 (直接用空格隔开，例如：汉堡 薯条 可乐)",
                   "name": "items",
-                  "widget": "list",
-                  "field": { "label": "菜名", "name": "item", "widget": "string" }
+                  "widget": "text"
                 }
               ]
             }
