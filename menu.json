@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "categoryId": "fastfood",
+      "categoryName": "🍔 快餐速食",
+      "items": "麦当劳 肯德基 汉堡王 沙县小吃 黄焖鸡米饭 兰州拉面 塔斯汀"
+    },
+    {
+      "categoryId": "chinese_chuan",
+      "categoryName": "🌶️ 中餐 - 川湘菜",
+      "items": "麻婆豆腐 回锅肉 宫保鸡丁 水煮肉片 辣椒炒肉 剁椒鱼头"
+    },
+    {
+      "categoryId": "chinese_yue",
+      "categoryName": "🍲 中餐 - 粤菜",
+      "items": "白切鸡 煲仔饭 干炒牛河 广式早茶 脆皮烧肉"
+    },
+    {
+      "categoryId": "global",
+      "categoryName": "🍣 异国料理",
+      "items": "回转寿司 日式拉面 韩式烤肉 意大利面 美式披萨 萨莉亚"
+    }
+  ]
+}
