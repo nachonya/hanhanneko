@@ -14,9 +14,11 @@
     <script>
       async function initModularCMS() {
         const baseConfig = {
+          // 🌟 关键修正：load_config_file 必须写在 baseConfig 这个对象内部！
+          load_config_file: false, 
           backend: {
             name: "github",
-            repo: "nachonya/hanhanneko",
+            repo: "nachonya/hanhanneko", // 你的 GitHub 仓库
             branch: "main"
           },
           media_folder: "images",
@@ -38,15 +40,12 @@
             }
           }
 
-          // 彻底关闭加载 config.yml 的行为
-          window.CMS.init({ 
-            config: baseConfig,
-            load_config_file: false 
-          });
+          // 恢复成最干净的初始化方式
+          window.CMS.init({ config: baseConfig });
 
         } catch (error) {
           console.error(error);
-          document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>系统启动失败，请检查文件结构</h2>";
+          document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>系统启动失败，请检查网络或 modules.json</h2>";
         }
       }
 
