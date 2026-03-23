@@ -42,7 +42,6 @@
             color: var(--primary);
         }
 
-        /* 分类选择区 UI */
         .selection-area {
             margin-bottom: 30px;
             padding: 15px;
@@ -90,7 +89,6 @@
             accent-color: var(--primary);
         }
 
-        /* 抽奖展示区 UI */
         .draw-area {
             text-align: center;
         }
@@ -160,7 +158,7 @@
     <h1>🎲 下一顿吃什么？</h1>
 
     <div class="selection-area" id="selectionArea">
-        </div>
+    </div>
 
     <div class="draw-area">
         <div class="result-box" id="resultBox">等待抽取...</div>
@@ -170,64 +168,33 @@
 </div>
 
 <script>
-    // ==========================================
-    // 1. 数据配置 (方便你后期接入管理后台的 API)
-    // ==========================================
-    const foodData = [
-        {
-            categoryId: "fastfood",
-            categoryName: "🍔 快餐速食",
-            items: ["麦当劳", "肯德基", "汉堡王", "沙县小吃", "黄焖鸡米饭", "兰州拉面", "塔斯汀"]
-        },
-        {
-            categoryId: "chinese_chuan",
-            categoryName: "🌶️ 中餐 - 川湘菜",
-            items: ["麻婆豆腐", "回锅肉", "宫保鸡丁", "水煮肉片", "辣椒炒肉", "剁椒鱼头"]
-        },
-        {
-            categoryId: "chinese_yue",
-            categoryName: "🍲 中餐 - 粤菜",
-            items: ["白切鸡", "煲仔饭", "干炒牛河", "广式早茶", "脆皮烧肉"]
-        },
-        {
-            categoryId: "global",
-            categoryName: "🍣 异国料理",
-            items: ["回转寿司", "日式拉面", "韩式烤肉", "意大利面", "美式披萨", "萨莉亚"]
-        }
-    ];
-
-    // ==========================================
-    // 2. 界面初始化与渲染逻辑
-    // ==========================================
+    let foodData = [];
     const selectionArea = document.getElementById('selectionArea');
     const resultBox = document.getElementById('resultBox');
     const startBtn = document.getElementById('startBtn');
     const statsDisplay = document.getElementById('statsDisplay');
 
-    // 动态生成复选框
     function renderCheckboxes() {
-        selectionArea.innerHTML = ''; // 清空
+        selectionArea.innerHTML = '';
         
         foodData.forEach(category => {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'category-group';
             
-            // 分类标题
             const titleDiv = document.createElement('div');
             titleDiv.className = 'category-title';
             titleDiv.innerText = category.categoryName;
             groupDiv.appendChild(titleDiv);
 
-            // 复选框容器
             const gridDiv = document.createElement('div');
             gridDiv.className = 'checkbox-grid';
 
-            // 渲染具体的菜系/选项作为独立复选框（这里按整个菜系来选，符合你"快餐+川菜"的需求）
             const label = document.createElement('label');
             label.className = 'checkbox-label';
+            const shortName = category.categoryName.split(' ')[1] || category.categoryName;
             label.innerHTML = `
                 <input type="checkbox" value="${category.categoryId}" onchange="updatePoolStats()"> 
-                全选 ${category.categoryName.split(' ')[1]}
+                全选 ${shortName}
             `;
             gridDiv.appendChild(label);
 
@@ -236,7 +203,6 @@
         });
     }
 
-   // 获取当前选中的所有菜品池
     function getCurrentPool() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         let currentPool = [];
@@ -244,13 +210,9 @@
         checkboxes.forEach(cb => {
             const category = foodData.find(c => c.categoryId === cb.value);
             if (category && category.items) {
-                // 🌟 核心智能拆分逻辑 🌟
                 let itemsArray = category.items;
                 
-                // 如果读取到的是字符串（新版后台的数据格式）
                 if (typeof itemsArray === 'string') {
-                    // 正则表达式：支持用 空格、换行、英文逗号、中文逗号、顿号 来拆分！
-                    // filter 确保不会把多打的空格识别成空的菜品
                     itemsArray = itemsArray.split(/[\s,，、\n]+/).filter(item => item.trim() !== '');
                 }
                 
@@ -258,32 +220,26 @@
             }
         });
         
-        // 去重（以防万一你输入了重复菜品）
         return [...new Set(currentPool)];
     }
 
-    // 更新选中状态显示
     function updatePoolStats() {
         const pool = getCurrentPool();
         statsDisplay.innerText = `当前选中了 ${pool.length} 个备选菜品入池`;
     }
 
-    // ==========================================
-    // 3. 抽奖动画与核心逻辑
-    // ==========================================
     let drawInterval = null;
     let isDrawing = false;
 
     function startDraw() {
         const pool = getCurrentPool();
 
-        // 校验拦截
         if (pool.length === 0) {
             alert("⚠️ 请至少选择一个分类哦！");
             return;
         }
 
-        if (isDrawing) return; // 防止重复点击
+        if (isDrawing) return;
 
         isDrawing = true;
         startBtn.disabled = true;
@@ -291,16 +247,14 @@
         resultBox.classList.add('animating');
 
         let counter = 0;
-        const totalDuration = 2500; // 动画总时长（毫秒）
-        const intervalSpeed = 50;   // 名字切换速度（毫秒）
+        const totalDuration = 2500;
+        const intervalSpeed = 50;
 
-        // 跑马灯动画
         drawInterval = setInterval(() => {
             const randomIndex = Math.floor(Math.random() * pool.length);
             resultBox.innerText = pool[randomIndex];
             counter += intervalSpeed;
 
-            // 停止动画
             if (counter >= totalDuration) {
                 clearInterval(drawInterval);
                 finishDraw(pool);
@@ -309,26 +263,35 @@
     }
 
     function finishDraw(pool) {
-        // 最终决定！
         const finalWinner = pool[Math.floor(Math.random() * pool.length)];
         resultBox.innerText = finalWinner;
         
-        // 恢复 UI 状态
         resultBox.classList.remove('animating');
         startBtn.disabled = false;
         startBtn.innerText = "再抽一次";
         isDrawing = false;
         
-        // 可选：添加一点小动效或烟花
         resultBox.style.transform = "scale(1.1)";
         setTimeout(() => resultBox.style.transform = "scale(1)", 200);
     }
 
-    // 页面加载完成后执行
-    window.onload = () => {
-        renderCheckboxes();
-        updatePoolStats();
-    };
+    fetch('./menu.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.categories) {
+                foodData = data.categories;
+                renderCheckboxes();
+                updatePoolStats();
+            }
+        })
+        .catch(error => {
+            selectionArea.innerHTML = '<p style="color:red;">无法加载菜单数据，请检查网络或确认 menu.json 已生成。</p>';
+        });
 </script>
 
 </body>
