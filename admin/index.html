@@ -34,11 +34,11 @@
               const modSchema = await modRes.json();
               baseConfig.collections.push(...modSchema.collections);
             } catch (err) {
-              console.warn(`Failed to load module: ${moduleName}`, err);
+              console.warn(`无法加载模块: ${moduleName}`, err);
             }
           }
 
-        // 🌟 把原来的 window.CMS.init({ config: baseConfig }); 换成下面这三行 🌟
+          // 彻底关闭加载 config.yml 的行为
           window.CMS.init({ 
             config: baseConfig,
             load_config_file: false 
