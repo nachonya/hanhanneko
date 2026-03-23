@@ -2,8 +2,8 @@
   "categories": [
     {
       "categoryId": "fastfood",
-      "categoryName": "🍔 快餐速食",
-      "items": "麦当劳 肯德基 汉堡王 沙县小吃 黄焖鸡米饭 兰州拉面 塔斯汀"
+      "categoryName": "🍔 快餐速食(主食)",
+      "items": "牛肉堡 鸡肉堡 鱼肉堡 墨西哥肉卷 披萨 塔可"
     },
     {
       "categoryId": "chinese_chuan",
@@ -19,6 +19,11 @@
       "categoryId": "global",
       "categoryName": "🍣 异国料理",
       "items": "回转寿司 日式拉面 韩式烤肉 意大利面 美式披萨 萨莉亚"
+    },
+    {
+      "categoryId": "fastfood2",
+      "categoryName": "快餐（小吃）",
+      "items": "热狗 带骨炸鸡 鸡米花 炸鸡柳 薯条 薯饼 洋葱圈 芝士条"
     }
   ]
 }
