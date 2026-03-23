@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今天吃什么？</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --primary-hover: #fa5252;
+            --bg: #f8f9fa;
+            --text: #343a40;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        /* 分类选择区 UI */
+        .selection-area {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f1f3f5;
+            border-radius: 12px;
+        }
+
+        .category-group {
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 4px;
+        }
+
+        .checkbox-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+        }
+
+        .checkbox-label:hover {
+            border-color: var(--primary);
+        }
+
+        .checkbox-label input {
+            margin-right: 6px;
+            accent-color: var(--primary);
+        }
+
+        /* 抽奖展示区 UI */
+        .draw-area {
+            text-align: center;
+        }
+
+        .result-box {
+            height: 100px;
+            background: #fff5f5;
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .result-box.animating {
+            color: #868e96;
+            border-color: #ced4da;
+            background: #f8f9fa;
+        }
+
+        .btn-start {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-start:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-start:active {
+            transform: translateY(1px);
+        }
+
+        .btn-start:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #868e96;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎲 下一顿吃什么？</h1>
+
+    <div class="selection-area" id="selectionArea">
+        </div>
+
+    <div class="draw-area">
+        <div class="result-box" id="resultBox">等待抽取...</div>
+        <button class="btn-start" id="startBtn" onclick="startDraw()">开始抽取</button>
+        <div class="stats" id="statsDisplay">当前选中了 0 个菜品入池</div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. 数据配置 (方便你后期接入管理后台的 API)
+    // ==========================================
+    const foodData = [
+        {
+            categoryId: "fastfood",
+            categoryName: "🍔 快餐速食",
+            items: ["麦当劳", "肯德基", "汉堡王", "沙县小吃", "黄焖鸡米饭", "兰州拉面", "塔斯汀"]
+        },
+        {
+            categoryId: "chinese_chuan",
+            categoryName: "🌶️ 中餐 - 川湘菜",
+            items: ["麻婆豆腐", "回锅肉", "宫保鸡丁", "水煮肉片", "辣椒炒肉", "剁椒鱼头"]
+        },
+        {
+            categoryId: "chinese_yue",
+            categoryName: "🍲 中餐 - 粤菜",
+            items: ["白切鸡", "煲仔饭", "干炒牛河", "广式早茶", "脆皮烧肉"]
+        },
+        {
+            categoryId: "global",
+            categoryName: "🍣 异国料理",
+            items: ["回转寿司", "日式拉面", "韩式烤肉", "意大利面", "美式披萨", "萨莉亚"]
+        }
+    ];
+
+    // ==========================================
+    // 2. 界面初始化与渲染逻辑
+    // ==========================================
+    const selectionArea = document.getElementById('selectionArea');
+    const resultBox = document.getElementById('resultBox');
+    const startBtn = document.getElementById('startBtn');
+    const statsDisplay = document.getElementById('statsDisplay');
+
+    // 动态生成复选框
+    function renderCheckboxes() {
+        selectionArea.innerHTML = ''; // 清空
+        
+        foodData.forEach(category => {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'category-group';
+            
+            // 分类标题
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'category-title';
+            titleDiv.innerText = category.categoryName;
+            groupDiv.appendChild(titleDiv);
+
+            // 复选框容器
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'checkbox-grid';
+
+            // 渲染具体的菜系/选项作为独立复选框（这里按整个菜系来选，符合你"快餐+川菜"的需求）
+            const label = document.createElement('label');
+            label.className = 'checkbox-label';
+            label.innerHTML = `
+                <input type="checkbox" value="${category.categoryId}" onchange="updatePoolStats()"> 
+                全选 ${category.categoryName.split(' ')[1]}
+            `;
+            gridDiv.appendChild(label);
+
+            groupDiv.appendChild(gridDiv);
+            selectionArea.appendChild(groupDiv);
+        });
+    }
+
+   // 获取当前选中的所有菜品池
+    function getCurrentPool() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        let currentPool = [];
+        
+        checkboxes.forEach(cb => {
+            const category = foodData.find(c => c.categoryId === cb.value);
+            if (category && category.items) {
+                // 🌟 核心智能拆分逻辑 🌟
+                let itemsArray = category.items;
+                
+                // 如果读取到的是字符串（新版后台的数据格式）
+                if (typeof itemsArray === 'string') {
+                    // 正则表达式：支持用 空格、换行、英文逗号、中文逗号、顿号 来拆分！
+                    // filter 确保不会把多打的空格识别成空的菜品
+                    itemsArray = itemsArray.split(/[\s,，、\n]+/).filter(item => item.trim() !== '');
+                }
+                
+                currentPool = currentPool.concat(itemsArray);
+            }
+        });
+        
+        // 去重（以防万一你输入了重复菜品）
+        return [...new Set(currentPool)];
+    }
+
+    // 更新选中状态显示
+    function updatePoolStats() {
+        const pool = getCurrentPool();
+        statsDisplay.innerText = `当前选中了 ${pool.length} 个备选菜品入池`;
+    }
+
+    // ==========================================
+    // 3. 抽奖动画与核心逻辑
+    // ==========================================
+    let drawInterval = null;
+    let isDrawing = false;
+
+    function startDraw() {
+        const pool = getCurrentPool();
+
+        // 校验拦截
+        if (pool.length === 0) {
+            alert("⚠️ 请至少选择一个分类哦！");
+            return;
+        }
+
+        if (isDrawing) return; // 防止重复点击
+
+        isDrawing = true;
+        startBtn.disabled = true;
+        startBtn.innerText = "抽取中...";
+        resultBox.classList.add('animating');
+
+        let counter = 0;
+        const totalDuration = 2500; // 动画总时长（毫秒）
+        const intervalSpeed = 50;   // 名字切换速度（毫秒）
+
+        // 跑马灯动画
+        drawInterval = setInterval(() => {
+            const randomIndex = Math.floor(Math.random() * pool.length);
+            resultBox.innerText = pool[randomIndex];
+            counter += intervalSpeed;
+
+            // 停止动画
+            if (counter >= totalDuration) {
+                clearInterval(drawInterval);
+                finishDraw(pool);
+            }
+        }, intervalSpeed);
+    }
+
+    function finishDraw(pool) {
+        // 最终决定！
+        const finalWinner = pool[Math.floor(Math.random() * pool.length)];
+        resultBox.innerText = finalWinner;
+        
+        // 恢复 UI 状态
+        resultBox.classList.remove('animating');
+        startBtn.disabled = false;
+        startBtn.innerText = "再抽一次";
+        isDrawing = false;
+        
+        // 可选：添加一点小动效或烟花
+        resultBox.style.transform = "scale(1.1)";
+        setTimeout(() => resultBox.style.transform = "scale(1)", 200);
+    }
+
+    // 页面加载完成后执行
+    window.onload = () => {
+        renderCheckboxes();
+        updatePoolStats();
+    };
+</script>
+
+</body>
+</html>
