@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>NPC 预设编辑器</title>
+<style>
+    body { font-family: system-ui, sans-serif; background: #1e1e2e; color: #cdd6f4; margin: 0; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .panel { background: #313244; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .full-width { grid-column: 1 / -1; }
+    h2 { margin-top: 0; color: #89b4fa; border-bottom: 1px solid #45475a; padding-bottom: 10px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #bac2de; }
+    input[type="text"], input[type="number"], textarea { width: 100%; padding: 8px; box-sizing: border-box; background: #181825; border: 1px solid #45475a; color: #cdd6f4; border-radius: 4px; }
+    textarea { height: 150px; resize: vertical; }
+    .flex-row { display: flex; gap: 10px; }
+    .flex-row .form-group { flex: 1; }
+    button { background: #89b4fa; color: #11111b; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+    button:hover { background: #b4befe; }
+    input[type="file"] { display: none; }
+    .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stat-result { display: flex; justify-content: space-between; background: #181825; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+    .stat-name { font-weight: bold; color: #f38ba8; }
+    .stat-val { color: #a6e3a1; font-family: monospace; font-size: 1.1em; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="full-width btn-group">
+        <button onclick="document.getElementById('fileInput').click()">导入 JSON</button>
+        <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+        <button onclick="exportJSON()">导出 JSON</button>
+    </div>
+
+    <div class="panel">
+        <h2>基础信息</h2>
+        <div class="form-group">
+            <label>NPC 姓名 (用作文件名)</label>
+            <input type="text" id="npcName" oninput="updateAll()">
+        </div>
+        <div class="form-group">
+            <label>出生年份</label>
+            <input type="number" id="birthYear" oninput="updateAll()">
+        </div>
+        <div class="form-group">
+            <label>背景故事</label>
+            <textarea id="background" oninput="updateAll()"></textarea>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>性格参数 (0 - 10)</h2>
+        <div class="flex-row">
+            <div class="form-group"><label>野心</label><input type="number" id="ambition" min="0" max="10" value="5" oninput="updateAll()"></div>
+            <div class="form-group"><label>勇敢</label><input type="number" id="bravery" min="0" max="10" value="5" oninput="updateAll()"></div>
+            <div class="form-group"><label>理性</label><input type="number" id="rationality" min="0" max="10" value="5" oninput="updateAll()"></div>
+        </div>
+        <div class="flex-row">
+            <div class="form-group"><label>仁慈</label><input type="number" id="mercy" min="0" max="10" value="5" oninput="updateAll()"></div>
+            <div class="form-group"><label>忠义</label><input type="number" id="loyalty" min="0" max="10" value="5" oninput="updateAll()"></div>
+            <div class="form-group"><label>悟性</label><input type="number" id="learning" min="0" max="10" value="5" oninput="updateAll()"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>基础能力 (0 - 100)</h2>
+        <div class="flex-row">
+            <div class="form-group"><label>谋略</label><input type="number" id="base_strategy" min="0" max="100" value="50" oninput="updateAll()"></div>
+            <div class="form-group"><label>军事</label><input type="number" id="base_military" min="0" max="100" value="50" oninput="updateAll()"></div>
+            <div class="form-group"><label>武力</label><input type="number" id="base_force" min="0" max="100" value="50" oninput="updateAll()"></div>
+        </div>
+        <div class="flex-row">
+            <div class="form-group"><label>智力</label><input type="number" id="base_intelligence" min="0" max="100" value="50" oninput="updateAll()"></div>
+            <div class="form-group"><label>人情</label><input type="number" id="base_social" min="0" max="100" value="50" oninput="updateAll()"></div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>最终面板 (受性格影响)</h2>
+        <div class="stat-result"><span class="stat-name">谋略</span><span class="stat-val" id="final_strategy">50</span></div>
+        <div class="stat-result"><span class="stat-name">军事</span><span class="stat-val" id="final_military">50</span></div>
+        <div class="stat-result"><span class="stat-name">武力</span><span class="stat-val" id="final_force">50</span></div>
+        <div class="stat-result"><span class="stat-name">智力</span><span class="stat-val" id="final_intelligence">50</span></div>
+        <div class="stat-result"><span class="stat-name">人情世故</span><span class="stat-val" id="final_social">50</span></div>
+    </div>
+
+    <div class="panel full-width">
+        <h2>AI 提示词预览 (实时生成)</h2>
+        <textarea id="promptPreview" readonly style="height: 250px; background: #11111b;"></textarea>
+    </div>
+</div>
+
+<script>
+    let finalStats = {};
+
+    function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
+    function getVal(id) {
+        return parseFloat(document.getElementById(id).value) || 0;
+    }
+
+    function getStr(id) {
+        return document.getElementById(id).value || "";
+    }
+
+    function updateAll() {
+        const amb = getVal('ambition') - 5;
+        const brav = getVal('bravery') - 5;
+        const rat = getVal('rationality') - 5;
+        const mer = getVal('mercy') - 5;
+
+        finalStats = {
+            strategy: clamp(getVal('base_strategy') + (amb * 2) + (rat * 1), 0, 100),
+            military: clamp(getVal('base_military') + (brav * 1) + (rat * 1), 0, 100),
+            force: clamp(getVal('base_force') + (brav * 2) - (mer * 1), 0, 100),
+            intelligence: clamp(getVal('base_intelligence') + (rat * 2), 0, 100),
+            social: clamp(getVal('base_social') - (amb * 1) + (mer * 2), 0, 100)
+        };
+
+        document.getElementById('final_strategy').innerText = finalStats.strategy;
+        document.getElementById('final_military').innerText = finalStats.military;
+        document.getElementById('final_force').innerText = finalStats.force;
+        document.getElementById('final_intelligence').innerText = finalStats.intelligence;
+        document.getElementById('final_social').innerText = finalStats.social;
+
+        generatePrompt();
+    }
+
+    function generatePrompt() {
+        const name = getStr('npcName') || "[未命名]";
+        const bg = getStr('background');
+        const p = {
+            amb: getVal('ambition'),
+            brav: getVal('bravery'),
+            rat: getVal('rationality'),
+            mer: getVal('mercy'),
+            loy: getVal('loyalty'),
+            lrn: getVal('learning')
+        };
+
+        let prompt = `你的名字是${name}。\n背景：${bg}\n\n`;
+        prompt += `【深层性格基底 (0-10)】：\n`;
+        prompt += `- 野心：${p.amb} | 勇敢：${p.brav} | 理性：${p.rat} | 仁慈：${p.mer} | 忠义：${p.loy} | 悟性：${p.lrn}\n\n`;
+        prompt += `【表层能力数值】（请在对话的字里行间体现，不可直接念出数值）：\n`;
+        prompt += `- 谋略 ${finalStats.strategy} | 军事 ${finalStats.military} | 武力 ${finalStats.force} | 智力 ${finalStats.intelligence} | 人情世故 ${finalStats.social}\n\n`;
+        prompt += `【好感与恐惧机制】：\n`;
+        prompt += `你当前对玩家的真实好感度为 {true_favorability}/100，伪装好感度为 {displayed_favorability}/100，恐惧值为 {fear}/100。\n`;
+        prompt += `如果恐惧高且好感低，结合你的勇敢数值决定是宁死不屈还是屈打成招。\n`;
+        prompt += `如果你的人情世故极高且真实好感极低，你会表现出笑里藏刀，用极高的伪装好感度误导玩家。`;
+
+        document.getElementById('promptPreview').value = prompt;
+    }
+
+    function exportJSON() {
+        const data = {
+            name: getStr('npcName'),
+            birth_year: getVal('birthYear'),
+            background: getStr('background'),
+            personality: {
+                ambition: getVal('ambition'),
+                bravery: getVal('bravery'),
+                rationality: getVal('rationality'),
+                mercy: getVal('mercy'),
+                loyalty: getVal('loyalty'),
+                learning_ability: getVal('learning')
+            },
+            base_stats: {
+                strategy: getVal('base_strategy'),
+                military: getVal('base_military'),
+                force: getVal('base_force'),
+                intelligence: getVal('base_intelligence'),
+                social: getVal('base_social')
+            },
+            final_stats: finalStats,
+            dynamic: {
+                true_favorability: 0,
+                displayed_favorability: 0,
+                fear: 0,
+                anger: 0
+            },
+            memos: [],
+            system_prompt: document.getElementById('promptPreview').value
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 4));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", (data.name || "npc_template") + ".json");
+        dlAnchorElem.click();
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                document.getElementById('npcName').value = data.name || "";
+                document.getElementById('birthYear').value = data.birth_year || 0;
+                document.getElementById('background').value = data.background || "";
+
+                if(data.personality) {
+                    document.getElementById('ambition').value = data.personality.ambition || 5;
+                    document.getElementById('bravery').value = data.personality.bravery || 5;
+                    document.getElementById('rationality').value = data.personality.rationality || 5;
+                    document.getElementById('mercy').value = data.personality.mercy || 5;
+                    document.getElementById('loyalty').value = data.personality.loyalty || 5;
+                    document.getElementById('learning').value = data.personality.learning_ability || 5;
+                }
+
+                if(data.base_stats) {
+                    document.getElementById('base_strategy').value = data.base_stats.strategy || 50;
+                    document.getElementById('base_military').value = data.base_stats.military || 50;
+                    document.getElementById('base_force').value = data.base_stats.force || 50;
+                    document.getElementById('base_intelligence').value = data.base_stats.intelligence || 50;
+                    document.getElementById('base_social').value = data.base_stats.social || 50;
+                }
+
+                updateAll();
+            } catch (err) {
+                alert("JSON 解析失败，请检查文件格式。");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    updateAll();
+</script>
+</body>
+</html>
