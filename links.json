@@ -89,6 +89,13 @@
       "desc": "一个网络小工具，具体要自己研究才行",
       "emoji": "",
       "custom_icon": ""
+    },
+    {
+      "name": "下一顿吃什么",
+      "url": "food.html",
+      "desc": "",
+      "emoji": "",
+      "custom_icon": ""
     }
   ]
 }
