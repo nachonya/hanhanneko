@@ -1,0 +1,152 @@
+[
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "获取字符串长度应该使用下列哪个方法?( )",
+    "options": ["length", "length()", "codePointAt()", "charAt()"],
+    "answer": 1,
+    "explanation": "在 Java 中，获取 String 字符串的长度使用的是 length() 方法；而获取数组的长度使用的是 length 属性。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "当编译和运行下列代码时会发生什么?( )\npublic class Test{\n    public static void main(String[] args){\n        System.out.println(\"2\"+3);\n        System.out.println(2+3);\n        System.out.println(2+3+\"\");\n    }\n}",
+    "options": ["编译错误", "运行错误", "输出23、23和5", "输出23、5和5"],
+    "answer": 3,
+    "explanation": "第一个语句由于前面是字符串，发生字符串拼接，输出 23；第二个语句是纯数字相加，输出 5；第三个语句从左到右执行，先计算 2+3=5，然后再与空字符串拼接，输出 5。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "如果`String text = \"MingRiSoft\";`,则以下哪个选项是合法的?( )",
+    "options": ["text >= 3;", "text[3] = 'a';", "int length = text.length();", "text+12345;"],
+    "answer": 2,
+    "explanation": "A选项不能用关系运算符比较字符串和数字；B选项 Java 中不能用数组下标访问字符串字符；D选项不是一个合法的完整语句；C选项正确调用了获取长度的方法。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "当编译和运行下列代码时会发生什么?( )\npublic class Test{\n    public static void main(String[] args){\n        String text = \"ABCD\";\n        text.replace(\"C\",\"F\");\n        System.out.println(text);\n    }\n}",
+    "options": ["编译错误", "输出ABCEDF", "输出ABCFDE", "输出ABCD"],
+    "answer": 3,
+    "explanation": "Java 中的 String 是不可变（immutable）的。text.replace(\"C\",\"F\") 会返回一个新的字符串 \"ABFD\"，但并没有重新赋值给 text，所以原字符串 text 的值不变，依然输出 ABCD。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "在编译和运行下列代码时会发生什么?( )\npublic class Ref {\n    public static void main(String args[]){\n        String str = \"123456789\";\n        char mychar = str.charAt(9);\n        System.out.println(mychar);\n    }\n}",
+    "options": ["编译错误", "输出9", "输出123456789", "运行时出现错误"],
+    "answer": 3,
+    "explanation": "字符串长度为 9，合法的索引范围是 0 到 8。调用 charAt(9) 会导致索引越界，抛出 StringIndexOutOfBoundsException 运行时异常。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "Scanner类在哪个包中( )。",
+    "options": ["java.sql", "java.Scanner", "java.awt", "java.util"],
+    "answer": 3,
+    "explanation": "Scanner 是 Java 提供的一个用于扫描输入文本的实用程序，位于 java.util 包下。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "下面这段代码的含义是( )。\npublic static double max(double a,double b){\n    return a>b?a:b;\n}",
+    "options": ["返回a、b的平方", "返回a、b的最大值", "返回a、b的立方", "返回a、b的正弦值"],
+    "answer": 1,
+    "explanation": "这里使用了三元运算符 `? :`。如果 a 大于 b 则返回 a，否则返回 b，即求最大值。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "Math类的方法中获取随机数的方法是( )。",
+    "options": ["random()", "abs()", "sqrt()", "sin()"],
+    "answer": 0,
+    "explanation": "Math.random() 用于生成一个大于等于 0.0 且小于 1.0 的伪随机 double 值。abs是绝对值，sqrt是开平方，sin是正弦。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "下面代码的执行结果是( )指令。\nString str = \"ABCDefGh\";\nString lStr = str.toLowerCase();",
+    "options": ["abcdefgh", "ABCDefgh", "ABCDEFGH", "AbcdefGH"],
+    "answer": 0,
+    "explanation": "toLowerCase() 方法的作用是将字符串中的所有大写字母转换为小写字母。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "single_choice",
+    "question": "下面代码中的值是( )。\nString str = \"mingrikeji\";\nint i = str.indexOf(\"i\");\nSystem.out.println(i);",
+    "options": ["0", "2", "1", "5"],
+    "answer": 2,
+    "explanation": "indexOf() 返回指定子字符串在此字符串中第一次出现处的索引。'm' 的索引是 0，'i' 的索引是 1。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "下列程序应该填入的代码是____。\nimport java.util.Scanner;\npublic class Example2{\n    public static void main(String str[]){\n        String name;\n        int age;\n        String address;\n        //创建Scanner对象\n        __________\n        System.out.println(\"请输入姓名:\");\n        name = sc.nextLine();\n        System.out.println(\"姓名:\"+name);\n    }\n}",
+    "answer": ["Scanner sc = new Scanner(System.in);"],
+    "explanation": "根据下文调用了 `sc.nextLine()` 可以推断出，对象变量名为 sc，并且读取控制台输入需要传入 System.in。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "Date类在____包中。",
+    "answer": ["java.util"],
+    "explanation": "日常表示日期和时间的 Date 类位于 java.util 包下（注意 java.sql 包下也有 Date 类，通常基础题指 util 包）。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "以下代码的运行结果是?__________\npublic class Test {\n    public static void main(String[] args) {\n        String text1 = \"MingRi\";\n        String text2 = \"Soft\";\n        System.out.println(text1.replace(\"Ri\",\"ri\")+text2);\n    }\n}",
+    "answer": ["MingriSoft"],
+    "explanation": "replace(\"Ri\", \"ri\") 将 \"MingRi\" 变成了 \"Mingri\"，然后再与 \"Soft\" 拼接。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "java.lang包中的__________(类)将基本类型int封装成一个类。",
+    "answer": ["Integer"],
+    "explanation": "Java 为每种基本数据类型都提供了对应的包装类，int 对应的包装类是 Integer。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "抽象类Number是BigDecimal、BigInteger、Byte、Double、Float、Integer、Long和Short类的父类,Number的子类必须提供将表示的数值转换为相应基本数据类型的方法,例如转换为double类型的填写方法名__________的方法。",
+    "answer": ["doubleValue()"],
+    "explanation": "Number 类定义了一系列形如 xxxValue() 的方法来返回对应的基本类型数值，转换为 double 对应的方法是 doubleValue()。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "使用String类的哪个方法可以让字符串\"ABCdef\"和字符串\"abcDEF\"比较的返回值是true?________(填写方法名)。",
+    "answer": ["equalsIgnoreCase()"],
+    "explanation": "equals() 方法区分大小写，而 equalsIgnoreCase() 会忽略大小写进行字符串比较。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "在java中,int类型对应的包装类是( )",
+    "answer": ["Integer"],
+    "explanation": "为了在面向对象的环境中使用基本数据类型，Java 提供了包装类。int 的包装类是首字母大写并全拼的 Integer。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "阅读下面代码,写出运行结果:__________\nstatic class MultiProc{\n    static void proc(){\n        try {\n            int a = 0;\n            int b = 42 / a;\n            System.out.println(\"没有结果\");\n        } catch(ArithmeticException exception) {\n            System.out.println(\"in procedure\");\n        }\n    }\n    public static void main(String args[]){\n        try{\n            proc();\n        }catch(Exception e){\n            System.out.println(\"in main catch Exception\");\n        }\n    }\n}",
+    "answer": ["in procedure"],
+    "explanation": "proc() 方法中除以零会触发 ArithmeticException，该异常在 proc() 内部的 catch 块中被成功捕获并打印了 \"in procedure\"。由于异常已被处理并未向上抛出，main 方法中的 catch 块不会被触发。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "对于`String s1=new String(\"ok\");String s2=new String(\"ok\");s1.equals(s2)`的值是____。",
+    "answer": ["true"],
+    "explanation": "用 new 创建的两个 String 对象的内存地址不同，如果是 s1 == s2 会返回 false。但 equals() 方法被 String 类重写过，比较的是字符串的内容，因此返回 true。"
+  },
+  {
+    "chapter": "第7、8章：异常与常用类",
+    "type": "fill_blank",
+    "question": "下面程序的功能为计算数组下标为奇数的各元素的和,完成程序填空。\nint a[] = { 1,3,5,7,9,10 };\nint total = 0;\nfor(int i = 1; i < a.length; __________; )\n    total += a[i];",
+    "answer": ["i += 2"],
+    "explanation": "要求奇数下标的元素和，起始下标为 1，下一个奇数下标为 3、5...，因此每次步进应该是加上 2，即 i = i + 2 或 i += 2。"
+  }
+]

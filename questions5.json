@@ -1,0 +1,170 @@
+[
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个(个)不是Swing中的窗体?( )",
+    "options": ["JFrame", "JDialog", "JApplet", "JLabel"],
+    "answer": 3,
+    "explanation": "JFrame, JDialog, JApplet 都是容器类组件（窗体），而 JLabel 是一个用于显示文本或图像的标签组件。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个(个)不是Swing中的布局管理器?( )",
+    "options": ["AbsoluteLayout", "FlowLayout", "BorderLayout", "GridLayout"],
+    "answer": 0,
+    "explanation": "Swing 常用的布局管理器有 FlowLayout, BorderLayout, GridLayout 等。虽然可以通过 setLayout(null) 实现绝对布局，但并没有 AbsoluteLayout 这个布局管理器类。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "JScrollPane控件通常和哪些(个)控件组合使用?( )",
+    "options": ["JLabel", "JButton", "JTextField", "JTextArea"],
+    "answer": 3,
+    "explanation": "JScrollPane 是滚动面板，通常用于需要滚动条的组件，如 JTextArea（文本域）或 JTable。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个(个)方法可以用来给JComboBox控件增加选项?( )",
+    "options": ["addItem()", "ComboBoxModel", "Object[]", "Vector<?>"],
+    "answer": 0,
+    "explanation": "addItem() 是 JComboBox 类中直接添加选项的标准方法。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个(个)方法可以用来给JList控件增加选项?( )",
+    "options": ["addItem()", "setModel", "Object[]", "Vector<?>"],
+    "answer": 1,
+    "explanation": "JList 通常使用 setModel(ListModel) 来设置或更新数据源。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "KeyListener和KeyAdapter之间的关系是?( )",
+    "options": ["继承", "实现", "内部类", "无任何关系"],
+    "answer": 0,
+    "explanation": "KeyAdapter 是 KeyListener 接口的适配器类，它实现了 KeyListener 接口并提供了默认的空方法实现，用户只需继承 KeyAdapter 即可。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "通过如下代码为窗体事件增加监听器。当窗体激活后( )\naddWindowListener(new WindowAdapter() {\n    public void windowActivated(WindowEvent e) {\n        System.out.println(\"窗体激活\");\n    }\n});",
+    "options": ["在控制台上输出窗体激活", "在控制台上无输出", "编译错误", "运行错误"],
+    "answer": 0,
+    "explanation": "当窗体被激活时，会自动触发 windowActivated 事件，进而调用输出语句。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个(个)方法是在MouseMotionListener接口中定义的?( )",
+    "options": ["mousePressed()", "mouseReleased()", "mouseDragged()", "mouseClicked()"],
+    "answer": 2,
+    "explanation": "MouseMotionListener 负责鼠标移动和拖拽，包含 mouseDragged() 和 mouseMoved() 方法。其他三个属于 MouseListener。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "使用MouseEvent类中的哪个(些)方法可以获得鼠标相对于原控件的坐标?( )",
+    "options": ["getPoint()", "getPosition()", "getLocation()", "getX()和getY()"],
+    "answer": 3,
+    "explanation": "getX() 和 getY() 是获取鼠标事件发生时坐标的最常用方法。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪些方法不是JTable类的常用构造方法?( )",
+    "options": ["Table()", "JTable(int numRows, int numColumns)", "JTable(Object[][] rowData, Object[] columnNames)", "JTable(TableModel dm)"],
+    "answer": 0,
+    "explanation": "JTable 的类名是 JTable，不存在 Table() 这个构造方法。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "JTable类中哪个方法可以获得该对象的表格模型?( )",
+    "options": ["getTableModel()", "getDataModel()", "getCellModel", "getModel"],
+    "answer": 3,
+    "explanation": "JTable 继承自 JComponent，其获取模型的方法为 getModel()。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "如果需要获得表格第二行第一列的元素,可以使用下面哪条语句?( )",
+    "options": ["table.getValueAt(2,1);", "table.getValueAt(2,0);", "table.getValueAt(1,1);", "table.getValueAt(1,0);"],
+    "answer": 3,
+    "explanation": "表格索引从 0 开始。第二行索引为 1，第一列索引为 0，故为 (1,0)。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "如果需要将表格第二行的高度设置成100,可以使用下面哪条语句?( )",
+    "options": ["table.setRowHeight(1, 100);", "table.setRowHeight(2, 100);", "table.setRowHeight(1, 99);", "table.setRowHeight(2, 99);"],
+    "answer": 0,
+    "explanation": "setRowHeight 的第一个参数是行索引（从0开始），第二行对应的索引是 1。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "使用DefaultTableModel中哪些方法可以给表格增加行数据?( )",
+    "options": ["insertRow(Object[] rowData)", "addRow(Vector rowData)", "addRows(Object[] rowData)", "addRows(Vector rowData)"],
+    "answer": 1,
+    "explanation": "DefaultTableModel 类中常用 addRow() 来添加行数据。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "single_choice",
+    "question": "下列哪个不是JTree类的构造方法?( )",
+    "options": ["Tree()", "JTree(TreeModel newModel)", "JTree(TreeNode root)", "JTree()"],
+    "answer": 0,
+    "explanation": "JTree 构造方法首字母大写，且不存在 Tree() 这个构造函数。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "Swing中如果设置窗体为可见,需要使用____方法。",
+    "answer": ["setVisible(true)"],
+    "explanation": "默认窗体是不可见的，必须调用 setVisible(true) 才能显示。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "Java中,如果需要禁止JButton控件响应鼠标点击事件,可以使用____方法。",
+    "answer": ["setEnabled(false)"],
+    "explanation": "setEnabled(false) 可以让组件进入灰置状态并禁止响应事件。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "可以使用____方法来修改密码框控件的回显字符。",
+    "answer": ["setEchoChar()"],
+    "explanation": "JPasswordField 组件通过 setEchoChar(char) 设置密码显示的替代字符（如 '*'）。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "JTextField组件用来实现一个文本框,接受用户输入的____。",
+    "answer": ["字符串 (或文本)"],
+    "explanation": "JTextField 是单行文本输入组件。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "JLabel组件用来显示____或图像,可以只显示其中一种,也可以二者同时显示。",
+    "answer": ["文本"],
+    "explanation": "JLabel 常用于展示说明性文本或图标。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "JFrame默认的布局方式是____。",
+    "explanation": "JFrame 默认使用 BorderLayout。"
+  },
+  {
+    "chapter": "第11、12章：Swing程序设计",
+    "type": "fill_blank",
+    "question": "程序填空：设计一个加法计算器，btn.addActionListener(______________), actionPerformed 中处理逻辑。",
+    "answer": ["this", "setLayout(new FlowLayout())"],
+    "explanation": "由于类实现了 ActionListener，所以按钮监听传入 this 即可。由于代码片段中未显式设置布局，需在构造器中添加布局设置以正确排列组件。"
+  }
+]

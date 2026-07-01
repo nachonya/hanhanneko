@@ -1,0 +1,115 @@
+[
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "当线程调用wait()方法处于等待状态时,哪个方法可以让其恢复运行?( )",
+    "options": ["join()方法", "run()方法", "notify()方法", "sleep()方法"],
+    "answer": 2,
+    "explanation": "wait() 方法使线程进入等待池，必须通过 notify() 或 notifyAll() 方法进行唤醒。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "对于如下代码,在A处使用哪些(个)语句可以在新线程中输出Hello World?(\npublic class Test implements Runnable {\n    public void run() {\n        System.out.println(\"Hello World\");\n    }\n    public static void main(String[] args) {\n        Test test = new Test();\n        Thread thread = new Thread(test);\n        //A\n    }\n})",
+    "options": ["test.run();", "thread.run();", "thread.start();", "System.out.println(\"Hello World\");"],
+    "answer": 2,
+    "explanation": "启动新线程必须调用 start() 方法，这样才会调用底层的 run() 方法实现多线程执行。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "当编译和运行下列代码时会发生什么?(\npublic class Test extends Thread {\n    public void start() {\n        for (int i = 0; i < 10; i++) {\n            System.out.print(i + \" \");\n        }\n    }\n    public static void main(String[] args) {\n        Test test = new Test();\n        test.run();\n    }\n})",
+    "options": ["编译错误", "运行错误", "正常运行,输出0 1 2 3 4 5 6 7 8 9", "正常运行,输出为空"],
+    "answer": 3,
+    "explanation": "代码重写了 start() 方法而非 run() 方法。main 方法调用的是 test.run()，而 Thread 的默认 run() 方法什么都不做，因此输出为空。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "如果下列代码能够正常运行,关于RunHandler类的哪个说法是正确的?(\npublic class Test {\n    public static void main(String[] args) {\n        Thread thread = new Thread(new RunHandler());\n    }\n})",
+    "options": ["RunHandler类必须实现Runnable接口", "RunHandler类必须继承Thread类", "RunHandler类必须编写start()方法", "RunHandler类必须编写init()方法"],
+    "answer": 0,
+    "explanation": "Thread(Runnable target) 构造函数要求传入的对象必须实现了 Runnable 接口。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "下面说法错误的是( )。",
+    "options": ["线程就是程序", "线程是一个程序的单个执行流", "多线程是指一个程序的多个执行流", "多线程用于实现并发"],
+    "answer": 0,
+    "explanation": "线程只是程序执行的基本单位，不是程序本身。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "编译运行下面的代码会发生什么()\nclass Pmcraven extends Thread{\n    public void run(){ ... System.out.println(sName); }\n}\n...\npm1.run(); pm2.run();",
+    "options": ["编译错误", "输出 One One Two Two", "输出 One Two One Two", "输出 One Two Two One"],
+    "answer": 1,
+    "explanation": "调用的是 run() 方法而不是 start()，这仅仅是普通的方法调用，不会启动新线程，代码会按顺序同步执行。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "下列说法中错误的一项是( )。",
+    "options": ["一个线程是一个Thread类的实例", "线程从Runnable实例的run()方法开始执行", "线程操作的数据来自Runnable实例", "新建的线程调用start()方法就能立即进入运行状态"],
+    "answer": 3,
+    "explanation": "调用 start() 方法后，线程进入“可运行（Runnable）”状态，由操作系统调度器决定何时分配 CPU 时间片，不是立即运行。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "single_choice",
+    "question": "下面说法正确的是( )。",
+    "options": ["java中的线程是非抢占式的", "java中的线程不可以共享数据", "每个java程序都至少有一个线程,即主线程", "java中的线程不可以共享代码"],
+    "answer": 2,
+    "explanation": "Java 程序至少有一个主线程。Java 线程支持抢占式调度，且可以共享数据和代码。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "使用Thread类的__________方法启动新线程。",
+    "answer": ["start()"],
+    "explanation": "只有 start() 方法会通知 Java 虚拟机启动新线程并调用 run()。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "编写同步方法时需要使用__________关键字。",
+    "answer": ["synchronized"],
+    "explanation": "synchronized 关键字用于标记同步方法或同步代码块，保证同一时间只有一个线程访问。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "使用Thread类的__________方法可以让线程进入休眠状态并在一定的时间后自动唤醒。",
+    "answer": ["sleep()"],
+    "explanation": "sleep() 使当前线程暂时停止执行指定的毫秒数。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "在操作系统中,被称做轻型的进程是__________。",
+    "answer": ["线程"],
+    "explanation": "线程也被称为轻量级进程（LWP）。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "线程的生命周期包括__________、可执行、非可执行、消亡。",
+    "answer": ["新建"],
+    "explanation": "线程生命周期通常分为：新建 (New)、可运行 (Runnable)、运行 (Running)、阻塞/等待 (Blocked/Waiting)、消亡 (Terminated)。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "使用Thread类中__________方法来设定线程的优先级。",
+    "answer": ["setPriority()"],
+    "explanation": "setPriority(int) 用于设置线程优先级，范围通常是 1-10。"
+  },
+  {
+    "chapter": "第13章：多线程",
+    "type": "fill_blank",
+    "question": "结束线程有两种情况,一种是自然消亡(死亡),另一种是__________。",
+    "answer": ["强制终止 (或调用stop/中断)"],
+    "explanation": "通常指 run() 方法执行完毕自然结束，或者通过中断机制结束。"
+  }
+]

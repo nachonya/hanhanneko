@@ -1,0 +1,91 @@
+[
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "使用下列哪些(个)语句可以加载MySQL数据库驱动？( )",
+    "options": ["Class.forName(\"com.mysql.jdbc.Driver\");", "Class.loadDriver(\"com.mysql.jdbc.Driver\");", "Class.forName(\"Com.mysql.jdbc.Driver\");", "Class.loadDriver(\"com.mysql.jdbc.Driver\");"],
+    "answer": 0,
+    "explanation": "加载驱动的标准方式是使用 Class.forName() 并传入驱动类的全限定名（区分大小写）。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "下面代码中，会抛出哪些(个)类型的异常？\nClass.forName(DRIVER);",
+    "options": ["ClassNotFoundException", "SQLException", "JDBCException", "MySQLException"],
+    "answer": 0,
+    "explanation": "Class.forName() 方法显式声明了会抛出 ClassNotFoundException，因为指定的类名可能在类路径中找不到。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "使用JDBC查询数据库时，如果结果集中没有数据，则？( )",
+    "options": ["获得的ResultSet对象为null", "获得的ResultSet对象如果调用next()方法会抛出异常", "获得的ResultSet对象如果调用next()方法会返回false", "获得的ResultSet对象如果调用getRow()方法会返回-1"],
+    "answer": 2,
+    "explanation": "如果 ResultSet 中没有行，第一次调用 next() 就会返回 false。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "JDBC的驱动类型有几种（）。",
+    "options": ["两种", "三种", "四种", "五种"],
+    "answer": 2,
+    "explanation": "JDBC 驱动分为四种类型：Type 1 (JDBC-ODBC 桥), Type 2 (原生 API), Type 3 (中间件), Type 4 (纯 Java 驱动)。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "下面的说法正确的是（）。",
+    "options": ["Connection接口用来管理数据库", "Connection接口负责与特定的数据库进行连接", "Connection用来执行静态SQL语句", "Connection用来执行动态SQL语句"],
+    "answer": 1,
+    "explanation": "Connection 接口代表与特定数据库的物理连接，通过它可以创建 Statement 对象来执行 SQL。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "single_choice",
+    "question": "加载数据库驱动时，如果加载失败，会抛出（）。",
+    "answer": 1,
+    "explanation": "同第2题，Class.forName() 失败时抛出 ClassNotFoundException。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "如果MySQL数据库的URL是jdbc:mysql://localhost:3306/db_database15，则该数据库的默认端口号是____，数据库名是____。",
+    "answer": ["3306", "db_database15"],
+    "explanation": "在 URL 格式中，冒号后是端口号，最后的斜杠后是数据库名。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "如果要关闭连接，则可以使用Connection接口中的____方法(填写方法名)。",
+    "answer": ["close()"],
+    "explanation": "使用 close() 方法释放数据库连接资源。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "java.sql.ResultSet是类还是接口？____。",
+    "answer": ["接口"],
+    "explanation": "ResultSet 是一个定义了结果集操作行为的接口。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "当对数据库中的数据进行指定的静态查询操作时，需要调用____方法(填写方法名)。",
+    "answer": ["executeQuery()"],
+    "explanation": "Statement 的 executeQuery() 方法用于执行返回 ResultSet 的查询语句。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "getConnection(String url, String user, String password)方法中，三个参数代表的含义是要连接数据库的____、用户名和密码。",
+    "answer": ["URL (统一资源定位符)"],
+    "explanation": "第一个参数是数据库的连接字符串 URL。"
+  },
+  {
+    "chapter": "第15章：JDBC数据库编程",
+    "type": "fill_blank",
+    "question": "程序填空：Con=________(\"jdbc:odbc:test\",\"goon\",\"ookk\"); Stmt=________; ResultSet rs=________(\"SELECT * FROM cidian\"); while(________)",
+    "answer": ["DriverManager.getConnection", "Con.createStatement()", "Stmt.executeQuery", "rs.next()"],
+    "explanation": "这是标准的 JDBC 连接与查询代码模板：通过 DriverManager 获取连接，创建 Statement 对象，执行查询，并使用 rs.next() 遍历结果集。"
+  }
+]

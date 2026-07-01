@@ -1,0 +1,116 @@
+[
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "端口号的取值范围是( )",
+    "options": ["0-32768", "0-65535", "0-256", "任何整数"],
+    "answer": 1,
+    "explanation": "端口号由 16 位二进制数表示，因此范围是 0 到 2^16-1，即 0-65535。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "InetAddress类属于哪个Java包?( )",
+    "options": ["java.util", "java.net", "java.text", "javax.net"],
+    "answer": 1,
+    "explanation": "InetAddress 是 Java 网络编程中用于封装 IP 地址的类，位于 java.net 包中。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "Java的套接字服务器类是?( )",
+    "options": ["ServerSocket", "SocketServer", "Socket", "Server"],
+    "answer": 0,
+    "explanation": "ServerSocket 是用于实现服务器端套接字的类。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "TCP与UDP哪个传输数据比较安全?( )",
+    "options": ["TCP", "两个都安全", "UDP", "两个都不安全"],
+    "answer": 0,
+    "explanation": "TCP 是面向连接的、可靠的协议，提供数据重传和顺序保障；UDP 是无连接的、不可靠的协议。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "下列哪种方法不是创建套接字的构造方法( )",
+    "options": ["ServerSocket()", "ServerSocket(int port)", "ServerSocket(int port, int backlog)", "ServerSocket(String edge)"],
+    "answer": 3,
+    "explanation": "ServerSocket 没有接收 String 类型参数的构造方法。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "接收套接字连接的语法格式是( )。",
+    "options": ["serverSocket.accept()", "InetAddress地址创建", "获取本地IP", "Socket构造器"],
+    "answer": 0,
+    "explanation": "ServerSocket.accept() 方法用于阻塞监听客户端的连接请求，成功后返回一个 Socket 对象。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "下面接收数据的语法格式中,正确的是( )。",
+    "options": ["socket.getOutputStream()", "socket.getinStream()", "socket.getInputStream()", "socket.getOutStream()"],
+    "answer": 2,
+    "explanation": "Socket 提供了 getInputStream() 获取输入流用于读取数据，getOutputStream() 获取输出流用于发送数据。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "下列方法中不是InetAddress类的常用方法是( )。",
+    "options": ["getLocalHost()", "getHostName()", "ClientFrame()", "getHostAddress()"],
+    "answer": 2,
+    "explanation": "ClientFrame 看起来像是一个图形界面组件名，非 InetAddress 的方法。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "single_choice",
+    "question": "关于UDP的描述中,正确的是( )。",
+    "options": ["UDP传递信息的速度更快", "UDP具有高可靠性", "发送信息可以确定传送到目的地", "UDP通信不需要使用类来实现"],
+    "answer": 0,
+    "explanation": "UDP 无需建立连接，开销小，因此传输速度通常比 TCP 快。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "____协议提供的是可靠无差错的数据传输，____协议不保证数据传输的可靠性",
+    "answer": ["TCP", "UDP"],
+    "explanation": "TCP 是可靠的连接协议，UDP 是不可靠的无连接协议。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "基于UDP网络程序设计中,使用____类来创建套接字连接。",
+    "answer": ["DatagramSocket"],
+    "explanation": "UDP 通信使用 DatagramSocket 和 DatagramPacket。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "____是代表计算机之间的连接对象，用于建立计算机之间的TCP连接。",
+    "answer": ["Socket"],
+    "explanation": "Socket 代表网络上的一个端点，是建立连接和通信的载体。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "ServerSocket类获取客户端连接的方法是____。",
+    "answer": ["accept()"],
+    "explanation": "accept() 方法会监听并接受连接。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "在java.net包中,IP地址由一个称为____的特殊的类来描述。",
+    "answer": ["InetAddress"],
+    "explanation": "InetAddress 是 Java 对 IP 地址的抽象。"
+  },
+  {
+    "chapter": "第14章：网络程序设计",
+    "type": "fill_blank",
+    "question": "填空题（客户端与服务器交互代码）：Socket st = ________; DataOutputStream outServ = ________; DataInputStream in = ________; String data = ________; ServerSocket serversocket = ________; Socket socket = ________;",
+    "answer": ["new Socket", "socket.getOutputStream()", "socket.getInputStream()", "in.readUTF()", "new ServerSocket", "serversocket.accept()"],
+    "explanation": "考察了 Socket 基础连接流程：实例化 Socket，通过输入输出流传递数据，以及服务器监听和接受连接。"
+  }
+]

@@ -1,0 +1,123 @@
+[
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "下列代码的运行结果是( )\npublic class Test {\n    public static void main(String[] args){\n        try {\n            File file = new File(\"d:/mrssoft.txt\");\n            file.createNewFile();\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n}",
+    "options": ["编译错误", "运行错误", "在D盘上创建mrssoft.txt文件", "在D盘上创建mrssoft文件"],
+    "answer": 2,
+    "explanation": "createNewFile() 方法会在指定的路径下创建文件，文件名即为字符串参数中指定的内容。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "使用File类中哪个方法可以判断文件是否是隐藏的?( )",
+    "options": ["isHidden()", "canHidden()", "isHiddened()", "canHiddened()"],
+    "answer": 0,
+    "explanation": "isHidden() 是 File 类中用于检查文件是否为隐藏文件的标准方法。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "Java.io包的File类是( )。",
+    "options": ["字符流类", "字节流类", "对象流类", "非流类"],
+    "answer": 3,
+    "explanation": "File 类用于表示文件或目录的路径名，它本身并不直接参与数据的输入输出流操作，因此属于非流类。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "在Java中,要创建一个新目录,要使用( )类的实例。",
+    "options": ["File", "FileOutputStream", "PrintWriter", "Dir"],
+    "answer": 0,
+    "explanation": "File 类不仅可以表示文件，还可以调用 mkdir() 或 mkdirs() 方法来创建目录。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "Java中要判断D盘下是否存在ab.txt文件,应该使用( )。",
+    "options": ["if(new File(\"d:/ab.txt\").exists()==1)", "if(File.exists(\"d:/ab.txt\")==1)", "if(new File(\"D:/ab.txt\").exists())", "if(File.exists(\"d:/ab.txt\"))"],
+    "answer": 2,
+    "explanation": "exists() 方法是 File 类的实例方法，返回 boolean 值，不需要与 1 比较。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "下面代码正确的是( )。",
+    "options": ["new InputStreamReader(new FileInputStream(\"a.dat\"))", "new InputStreamReader(new FileReader(\"a.dat\"))", "new InputStreamReader(new BufferedReader(\"a.dat\"))", "new InputStreamReader(\"a.dat\")"],
+    "answer": 0,
+    "explanation": "InputStreamReader 是转换流，它的构造方法通常接收一个字节流对象（InputStream），FileInputStream 正好是其子类。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "下面哪个是创建文件字节输出流常用的构造方法( )",
+    "options": ["FileOutputStream(String filePath)", "File", "FileInputStream(String filePath)", "FileInputStream(File file)"],
+    "answer": 0,
+    "explanation": "FileOutputStream 用于将数据写入文件，常用的构造器接受文件路径字符串或 File 对象。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "提供println()方法和print()方法的类是( )。",
+    "options": ["PrintStream", "System", "InputStream", "DataOutputStream"],
+    "answer": 0,
+    "explanation": "System.out 是 PrintStream 类型的对象，print 和 println 系列方法都在 PrintStream 类中定义。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "single_choice",
+    "question": "下面的说法正确的是( )。",
+    "options": ["InputStream与OutputStream都是抽象类", "Reader与Writer不是抽象类", "RandomAccessFile是抽象类", "File类是抽象类"],
+    "answer": 0,
+    "explanation": "InputStream 和 OutputStream 是所有字节流类的抽象基类。Reader 和 Writer 也是抽象类。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "下列代码的运行结果是__________。\nFile file = new File(\"C:\\\\\", \"Example1.txt\");\nSystem.out.println(file.getName());",
+    "answer": ["Example1.txt"],
+    "explanation": "getName() 方法返回的是文件路径中最后的文件名或目录名。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "JAVA程序是通过__________来完成输入输出的。",
+    "answer": ["流 (Stream)"],
+    "explanation": "Java 通过流（Stream）抽象来统一处理各种输入输出设备的数据传输。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "File类的delete()方法能否直接删除非空文件夹?____",
+    "answer": ["不能"],
+    "explanation": "delete() 方法只有在目录为空时才能成功删除目录，否则需先删除子文件。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "字节流是以____为单位来处理数据的。",
+    "answer": ["字节 (byte)"],
+    "explanation": "字节流（InputStream/OutputStream）直接操作二进制数据的基本单位——字节。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "字符流用于处理__________数据的读取和写入,它以字符为单位。__________和Writer是字符流的抽象类。",
+    "answer": ["文本", "Reader"],
+    "explanation": "字符流专门用于处理文本数据，Reader 和 Writer 是所有字符流的抽象基类。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "可以使用File类中的哪个方法实现重命名功能?________________（填写方法名）",
+    "answer": ["renameTo()"],
+    "explanation": "renameTo() 方法用于将 File 对象表示的文件重命名为参数指定的路径名。"
+  },
+  {
+    "chapter": "第10章：Java输入与输出",
+    "type": "fill_blank",
+    "question": "程序填空，实现文件拷贝功能。\nInputStream inputStream = ________________________;\nOutputStream outputStream = ________________________;\n...\nwhile ((bytesRead = inputStream.read(buffer)) != -1) {\n    ________________________;\n}",
+    "answer": ["new FileInputStream(file)", "new FileOutputStream(destinationFilePath)", "outputStream.write(buffer, 0, bytesRead)"],
+    "explanation": "文件拷贝流程：打开源文件的输入流，打开目标文件的输出流，循环读取并写入数据。"
+  }
+]
